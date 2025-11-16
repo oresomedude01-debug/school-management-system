@@ -663,25 +663,9 @@
         const sidebarClose = document.getElementById('sidebarClose');
         const mobileBackdrop = document.getElementById('mobileBackdrop');
 
-        // Handle navigation
+        // Close sidebar on navigation for mobile
         navItems.forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-
-                // Remove active class from all items
-                navItems.forEach(nav => {
-                    nav.classList.remove('active', 'text-white');
-                    nav.classList.add('text-gray-700');
-                });
-
-                // Add active class to clicked item
-                this.classList.add('active', 'text-white');
-                this.classList.remove('text-gray-700');
-
-                // Navigate to route
-                const route = this.dataset.route;
-                SchoolApp.router.navigate(route);
-
+            item.addEventListener('click', function() {
                 // Close sidebar on mobile after navigation
                 if (window.innerWidth < 1024) {
                     closeSidebar();
@@ -774,19 +758,8 @@
                     text.classList.remove('text-gray-500');
                     text.classList.add('text-indigo-600');
 
-                    // Navigate
-                    SchoolApp.router.navigate(route);
-
-                    // Update sidebar active state
-                    const sidebarNavItems = document.querySelectorAll('.nav-item');
-                    sidebarNavItems.forEach(nav => {
-                        nav.classList.remove('active', 'text-white');
-                        nav.classList.add('text-gray-700');
-                        if (nav.dataset.route === route) {
-                            nav.classList.add('active', 'text-white');
-                            nav.classList.remove('text-gray-700');
-                        }
-                    });
+                    // Navigate to the page
+                    window.location.href = '/' + route;
                 });
             }
         });
