@@ -2234,8 +2234,11 @@ const SchoolApp = {
 
     async loadInitialData() {
         try {
-            // Load navigation
-            this.renderNavigation();
+            // Load navigation only if mainNav element exists (backward compatibility)
+            const mainNav = $('#mainNav');
+            if (mainNav) {
+                this.renderNavigation();
+            }
 
             // Hide loading screen
             setTimeout(() => {
