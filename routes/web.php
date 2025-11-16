@@ -8,6 +8,7 @@ use App\Http\Controllers\ClassController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\GradeController;
+use App\Http\Controllers\LocalizationController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -65,4 +66,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/grades/{grade}', [GradeController::class, 'show']);
     Route::put('/api/grades/{grade}', [GradeController::class, 'update']);
     Route::delete('/api/grades/{grade}', [GradeController::class, 'destroy']);
+
+    // Localization
+    Route::get('/api/translations/{locale}', [LocalizationController::class, 'getTranslations']);
+    Route::post('/api/locale', [LocalizationController::class, 'setLocale']);
+    Route::get('/api/locale', [LocalizationController::class, 'getLocale']);
 });

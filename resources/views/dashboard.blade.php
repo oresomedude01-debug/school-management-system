@@ -211,6 +211,102 @@
     .mobile-search-active {
         animation: fadeInDown 0.3s ease-out;
     }
+
+    /* RTL Support */
+    [dir="rtl"] #sidebar {
+        left: auto;
+        right: 0;
+    }
+
+    [dir="rtl"] .sidebar-animation {
+        animation: slideInRight 0.5s ease-out;
+    }
+
+    [dir="rtl"] #sidebar.-translate-x-full {
+        transform: translateX(100%);
+    }
+
+    [dir="rtl"] .lg\:ml-64 {
+        margin-left: 0;
+        margin-right: 16rem;
+    }
+
+    [dir="rtl"] .nav-item:hover {
+        transform: translateX(-8px);
+    }
+
+    [dir="rtl"] .space-x-2 > * + *,
+    [dir="rtl"] .space-x-3 > * + *,
+    [dir="rtl"] .space-x-4 > * + * {
+        margin-left: 0;
+    }
+
+    [dir="rtl"] .space-x-2 > * + * {
+        margin-right: 0.5rem;
+    }
+
+    [dir="rtl"] .space-x-3 > * + * {
+        margin-right: 0.75rem;
+    }
+
+    [dir="rtl"] .space-x-4 > * + * {
+        margin-right: 1rem;
+    }
+
+    /* RTL Typography */
+    [dir="rtl"] body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Traditional Arabic', 'Arabic Typesetting';
+    }
+
+    [dir="rtl"] .text-left {
+        text-align: right;
+    }
+
+    [dir="rtl"] .text-right {
+        text-align: left;
+    }
+
+    /* RTL Animations - Reverse directional animations */
+    @keyframes slideInRTL {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    [dir="rtl"] .sidebar-animation {
+        animation: slideInRTL 0.5s ease-out;
+    }
+
+    /* Language Switcher Styling */
+    .lang-switcher {
+        position: relative;
+    }
+
+    .lang-dropdown {
+        min-width: 180px;
+    }
+
+    .lang-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.2s;
+    }
+
+    .lang-option:hover {
+        background-color: #f3f4f6;
+    }
+
+    .lang-option.active {
+        background-color: #eef2ff;
+        color: #667eea;
+        font-weight: 600;
+    }
 </style>
 
 <div id="app" class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
@@ -225,7 +321,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="mt-6 text-white text-lg font-semibold">Loading Excellence...</p>
+            <p class="mt-6 text-white text-lg font-semibold" data-i18n="dashboard.loading">Loading Excellence...</p>
         </div>
     </div>
 
@@ -243,8 +339,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-lg lg:text-xl font-bold sidebar-logo">Excellence</h1>
-                    <p class="text-xs text-gray-500">Academy</p>
+                    <h1 class="text-lg lg:text-xl font-bold sidebar-logo" data-i18n="app_name">Excellence</h1>
+                    <p class="text-xs text-gray-500" data-i18n="app_tagline">Academy</p>
                 </div>
             </div>
             <!-- Close button for mobile -->
@@ -262,7 +358,7 @@
                 <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                 </svg>
-                <span>Dashboard</span>
+                <span data-i18n="nav.dashboard">Dashboard</span>
             </a>
 
             <!-- Students -->
@@ -270,7 +366,7 @@
                 <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
-                <span>Students</span>
+                <span data-i18n="nav.students">Students</span>
             </a>
 
             <!-- Teachers -->
@@ -278,7 +374,7 @@
                 <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>
-                <span>Teachers</span>
+                <span data-i18n="nav.teachers">Teachers</span>
             </a>
 
             <!-- Classes -->
@@ -286,7 +382,7 @@
                 <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                 </svg>
-                <span>Classes</span>
+                <span data-i18n="nav.classes">Classes</span>
             </a>
 
             <!-- Subjects -->
@@ -294,7 +390,7 @@
                 <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
-                <span>Subjects</span>
+                <span data-i18n="nav.subjects">Subjects</span>
             </a>
 
             <!-- Attendance -->
@@ -302,7 +398,7 @@
                 <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                 </svg>
-                <span>Attendance</span>
+                <span data-i18n="nav.attendance">Attendance</span>
             </a>
 
             <!-- Grades -->
@@ -310,7 +406,7 @@
                 <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                <span>Grades</span>
+                <span data-i18n="nav.grades">Grades</span>
             </a>
         </nav>
 
@@ -385,6 +481,44 @@
                         </svg>
                         <span class="absolute top-1 right-1 h-2 w-2 bg-blue-500 rounded-full notification-badge"></span>
                     </button>
+
+                    <!-- Language Switcher -->
+                    <div class="relative lang-switcher">
+                        <button id="langMenuButton" class="p-2 rounded-xl hover:bg-white transition-all shadow-sm transform active:scale-95" title="Change Language">
+                            <svg class="h-5 w-5 lg:h-6 lg:w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                            </svg>
+                        </button>
+                        <div id="langMenu" class="hidden absolute right-0 mt-2 lang-dropdown rounded-2xl shadow-2xl bg-white ring-1 ring-black ring-opacity-5 z-10 overflow-hidden">
+                            <div class="px-4 py-2 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
+                                <p class="text-xs font-semibold text-gray-600" data-i18n="language.select">Select Language</p>
+                            </div>
+                            <div class="py-1">
+                                <button class="lang-option w-full px-4 py-3 text-sm text-left" data-lang="en">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-xl">🇬🇧</span>
+                                        <div class="flex-1">
+                                            <p class="font-medium text-gray-900">English</p>
+                                        </div>
+                                        <svg class="h-5 w-5 text-indigo-600 hidden" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </button>
+                                <button class="lang-option w-full px-4 py-3 text-sm text-left" data-lang="ar">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-xl">🇸🇦</span>
+                                        <div class="flex-1">
+                                            <p class="font-medium text-gray-900">العربية</p>
+                                        </div>
+                                        <svg class="h-5 w-5 text-indigo-600 hidden" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- User Menu -->
                     <div class="relative">
@@ -494,14 +628,21 @@
 @endsection
 
 @section('scripts')
+<script src="/js/i18n.js"></script>
 <script src="/js/charts.js"></script>
 <script src="/js/app.js"></script>
 <script>
     // Initialize the application
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
+        // Initialize i18n first
+        await i18n.init();
+        i18n.translatePage();
+
+        // Then initialize the app
         SchoolApp.init();
         initializeSidebarNavigation();
         initializeMobileFeatures();
+        initializeLanguageSwitcher();
     });
 
     function initializeSidebarNavigation() {
@@ -693,6 +834,91 @@
                 document.body.style.overflow = '';
             }
         }
+    }
+
+    function initializeLanguageSwitcher() {
+        const langMenuButton = document.getElementById('langMenuButton');
+        const langMenu = document.getElementById('langMenu');
+        const langOptions = document.querySelectorAll('.lang-option');
+
+        // Toggle language menu
+        if (langMenuButton && langMenu) {
+            langMenuButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                langMenu.classList.toggle('hidden');
+                // Close user menu if open
+                const userMenu = document.getElementById('userMenu');
+                if (userMenu && !userMenu.classList.contains('hidden')) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!langMenuButton.contains(e.target) && !langMenu.contains(e.target)) {
+                    langMenu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Handle language selection
+        langOptions.forEach(option => {
+            const lang = option.dataset.lang;
+
+            // Mark current language as active
+            if (lang === i18n.getLocale()) {
+                option.classList.add('active');
+                option.querySelector('svg').classList.remove('hidden');
+            }
+
+            option.addEventListener('click', async () => {
+                const selectedLang = option.dataset.lang;
+
+                // Update active state
+                langOptions.forEach(opt => {
+                    opt.classList.remove('active');
+                    opt.querySelector('svg').classList.add('hidden');
+                });
+                option.classList.add('active');
+                option.querySelector('svg').classList.remove('hidden');
+
+                // Set new locale
+                await i18n.setLocale(selectedLang);
+
+                // Translate the page
+                i18n.translatePage();
+
+                // Close menu
+                langMenu.classList.add('hidden');
+
+                // Show notification (optional)
+                console.log(`Language changed to: ${selectedLang}`);
+            });
+        });
+
+        // Listen for locale changes to update UI
+        document.addEventListener('localeChanged', (e) => {
+            const newLocale = e.detail.locale;
+            console.log('Locale changed to:', newLocale);
+
+            // Update sidebar position for RTL
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.lg\\:ml-64');
+
+            if (i18n.isRTL()) {
+                // RTL mode
+                sidebar.classList.add('sidebar-rtl');
+                if (mainContent) {
+                    mainContent.classList.add('rtl-content');
+                }
+            } else {
+                // LTR mode
+                sidebar.classList.remove('sidebar-rtl');
+                if (mainContent) {
+                    mainContent.classList.remove('rtl-content');
+                }
+            }
+        });
     }
 </script>
 @endsection
