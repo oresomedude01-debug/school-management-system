@@ -136,84 +136,194 @@ const DashboardComponent = {
 
             content.innerHTML = `
                 <div class="px-4 sm:px-0">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Dashboard Overview</h2>
+                    <div class="mb-6 flex items-center justify-between">
+                        <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Dashboard Overview</h2>
+                        <div class="text-sm text-gray-500">Welcome back! 👋</div>
+                    </div>
 
-                    <!-- Stats Grid -->
+                    <!-- Stats Grid with Animations -->
                     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-                        ${this.renderStatCard('Students', stats.total_students, 'bg-blue-500', 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z')}
-                        ${this.renderStatCard('Teachers', stats.total_teachers, 'bg-green-500', 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z')}
-                        ${this.renderStatCard('Classes', stats.total_classes, 'bg-purple-500', 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4')}
-                        ${this.renderStatCard('Subjects', stats.total_subjects, 'bg-yellow-500', 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253')}
+                        ${this.renderStatCard('Students', stats.total_students, 'bg-gradient-to-br from-blue-500 to-blue-600', 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', '+12%')}
+                        ${this.renderStatCard('Teachers', stats.total_teachers, 'bg-gradient-to-br from-green-500 to-green-600', 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', '+5%')}
+                        ${this.renderStatCard('Classes', stats.total_classes, 'bg-gradient-to-br from-purple-500 to-purple-600', 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', '+3%')}
+                        ${this.renderStatCard('Subjects', stats.total_subjects, 'bg-gradient-to-br from-yellow-500 to-orange-500', 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', '+8%')}
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <!-- Weekly Attendance Chart -->
+                        <div class="bg-white shadow-lg rounded-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300">
+                            <div class="px-6 py-5 border-b border-gray-200">
+                                <h3 class="text-lg leading-6 font-bold text-gray-900">Weekly Attendance</h3>
+                                <p class="mt-1 text-sm text-gray-500">Last 7 days attendance overview</p>
+                            </div>
+                            <div class="p-6">
+                                <canvas id="weeklyAttendanceChart" width="400" height="250"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Student Enrollment Trend -->
+                        <div class="bg-white shadow-lg rounded-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300">
+                            <div class="px-6 py-5 border-b border-gray-200">
+                                <h3 class="text-lg leading-6 font-bold text-gray-900">Enrollment Trend</h3>
+                                <p class="mt-1 text-sm text-gray-500">Monthly student enrollments</p>
+                            </div>
+                            <div class="p-6">
+                                <canvas id="enrollmentTrendChart" width="400" height="250"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Class Distribution -->
+                        <div class="bg-white shadow-lg rounded-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300">
+                            <div class="px-6 py-5 border-b border-gray-200">
+                                <h3 class="text-lg leading-6 font-bold text-gray-900">Class Distribution</h3>
+                                <p class="mt-1 text-sm text-gray-500">Students per class</p>
+                            </div>
+                            <div class="p-6 flex justify-center">
+                                <canvas id="classDistributionChart" width="350" height="280"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Performance Overview -->
+                        <div class="bg-white shadow-lg rounded-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300">
+                            <div class="px-6 py-5 border-b border-gray-200">
+                                <h3 class="text-lg leading-6 font-bold text-gray-900">Grade Distribution</h3>
+                                <p class="mt-1 text-sm text-gray-500">Current academic performance</p>
+                            </div>
+                            <div class="p-6 flex justify-center">
+                                <canvas id="gradeDistributionChart" width="350" height="280"></canvas>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Attendance Section -->
-                    <div class="bg-white overflow-hidden shadow rounded-lg mb-8">
-                        <div class="px-4 py-5 sm:p-6">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Today's Attendance</h3>
+                    <div class="bg-gradient-to-br from-blue-50 to-purple-50 overflow-hidden shadow-lg rounded-2xl mb-8 transform hover:scale-105 transition-transform duration-300">
+                        <div class="px-6 py-5">
+                            <h3 class="text-lg leading-6 font-bold text-gray-900 mb-4">Today's Attendance</h3>
                             <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
-                                <div class="bg-green-50 p-4 rounded-lg">
-                                    <p class="text-sm font-medium text-green-600">Present</p>
-                                    <p class="text-3xl font-bold text-green-700">${stats.present_today || 0}</p>
+                                <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-green-100 rounded-full p-3">
+                                            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="ml-4">
+                                            <p class="text-sm font-medium text-gray-600">Present</p>
+                                            <p class="text-3xl font-bold text-green-700">${stats.present_today || 0}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="bg-red-50 p-4 rounded-lg">
-                                    <p class="text-sm font-medium text-red-600">Absent</p>
-                                    <p class="text-3xl font-bold text-red-700">${stats.absent_today || 0}</p>
+                                <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-red-100 rounded-full p-3">
+                                            <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="ml-4">
+                                            <p class="text-sm font-medium text-gray-600">Absent</p>
+                                            <p class="text-3xl font-bold text-red-700">${stats.absent_today || 0}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="bg-blue-50 p-4 rounded-lg">
-                                    <p class="text-sm font-medium text-blue-600">Attendance Rate</p>
-                                    <p class="text-3xl font-bold text-blue-700">${stats.attendance_rate || 0}%</p>
+                                <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-blue-100 rounded-full p-3">
+                                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="ml-4">
+                                            <p class="text-sm font-medium text-gray-600">Attendance Rate</p>
+                                            <p class="text-3xl font-bold text-blue-700">${stats.attendance_rate || 0}%</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Recent Students -->
-                    <div class="bg-white shadow rounded-lg">
-                        <div class="px-4 py-5 sm:p-6">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Recently Added Students</h3>
-                            <div class="flow-root">
-                                <ul class="divide-y divide-gray-200">
-                                    ${stats.recent_students && stats.recent_students.length > 0
-                                        ? stats.recent_students.map(student => `
-                                            <li class="py-3">
-                                                <div class="flex items-center space-x-4">
-                                                    <div class="flex-shrink-0">
-                                                        <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-                                                            ${student.user.name.charAt(0).toUpperCase()}
+                    <!-- Recent Activity Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Recent Students -->
+                        <div class="bg-white shadow-lg rounded-2xl overflow-hidden">
+                            <div class="px-6 py-5 border-b border-gray-200">
+                                <h3 class="text-lg leading-6 font-bold text-gray-900">Recently Added Students</h3>
+                            </div>
+                            <div class="px-6 py-4">
+                                <div class="flow-root">
+                                    <ul class="divide-y divide-gray-200">
+                                        ${stats.recent_students && stats.recent_students.length > 0
+                                            ? stats.recent_students.map(student => `
+                                                <li class="py-4 hover:bg-gray-50 transition-colors rounded-lg px-2">
+                                                    <div class="flex items-center space-x-4">
+                                                        <div class="flex-shrink-0">
+                                                            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold shadow-lg">
+                                                                ${student.user.name.charAt(0).toUpperCase()}
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-1 min-w-0">
+                                                            <p class="text-sm font-semibold text-gray-900 truncate">${student.user.name}</p>
+                                                            <p class="text-xs text-gray-500 truncate">${student.admission_number}</p>
+                                                        </div>
+                                                        <div>
+                                                            <span class="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">New</span>
                                                         </div>
                                                     </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="text-sm font-medium text-gray-900 truncate">${student.user.name}</p>
-                                                        <p class="text-sm text-gray-500 truncate">${student.admission_number}</p>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        `).join('')
-                                        : '<li class="py-3 text-gray-500 text-center">No recent students</li>'
-                                    }
-                                </ul>
+                                                </li>
+                                            `).join('')
+                                            : '<li class="py-8 text-gray-400 text-center">No recent students</li>'
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="bg-white shadow-lg rounded-2xl overflow-hidden">
+                            <div class="px-6 py-5 border-b border-gray-200">
+                                <h3 class="text-lg leading-6 font-bold text-gray-900">Quick Actions</h3>
+                            </div>
+                            <div class="p-6">
+                                <div class="grid grid-cols-2 gap-4">
+                                    ${this.renderQuickAction('Add Student', 'students', 'M12 4v16m8-8H4', 'blue')}
+                                    ${this.renderQuickAction('Mark Attendance', 'attendance', 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', 'green')}
+                                    ${this.renderQuickAction('Enter Grades', 'grades', 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z', 'purple')}
+                                    ${this.renderQuickAction('View Reports', 'dashboard', 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'yellow')}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
+
+            // Initialize charts after DOM is ready
+            setTimeout(() => this.initCharts(), 100);
+
         } catch (error) {
             content.innerHTML = `
                 <div class="text-center py-8">
-                    <p class="text-red-600">Error loading dashboard: ${error.message}</p>
+                    <div class="text-red-600">
+                        <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-lg font-semibold">Error loading dashboard</p>
+                        <p class="text-sm">${error.message}</p>
+                    </div>
                 </div>
             `;
         }
     },
 
-    renderStatCard(title, value, bgColor, iconPath) {
+    renderStatCard(title, value, bgColor, iconPath, trend) {
         return `
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
+            <div class="bg-white overflow-hidden shadow-lg rounded-2xl transform hover:scale-105 transition-all duration-300 hover:shadow-2xl">
+                <div class="p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="${bgColor} rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="${bgColor} rounded-xl p-4 shadow-lg">
+                                <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}"></path>
                                 </svg>
                             </div>
@@ -221,13 +331,87 @@ const DashboardComponent = {
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">${title}</dt>
-                                <dd class="text-3xl font-semibold text-gray-900">${value || 0}</dd>
+                                <dd class="flex items-baseline">
+                                    <div class="text-3xl font-bold text-gray-900">${value || 0}</div>
+                                    ${trend ? `<span class="ml-2 text-sm font-semibold text-green-600">${trend}</span>` : ''}
+                                </dd>
                             </dl>
                         </div>
                     </div>
                 </div>
             </div>
         `;
+    },
+
+    renderQuickAction(title, route, iconPath, color) {
+        const colorClasses = {
+            blue: 'from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700',
+            green: 'from-green-500 to-green-600 hover:from-green-600 hover:to-green-700',
+            purple: 'from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700',
+            yellow: 'from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600'
+        };
+
+        return `
+            <button onclick="SchoolApp.router.navigate('${route}')"
+                    class="bg-gradient-to-br ${colorClasses[color]} text-white p-4 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex flex-col items-center justify-center space-y-2">
+                <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}"></path>
+                </svg>
+                <span class="text-sm font-semibold">${title}</span>
+            </button>
+        `;
+    },
+
+    initCharts() {
+        // Weekly Attendance Chart (Bar Chart)
+        new SimpleChart('weeklyAttendanceChart', {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    data: [450, 420, 480, 460, 470, 380, 150],
+                    backgroundColor: ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4', '#EC4899'],
+                    borderColor: ['#2563EB', '#059669', '#7C3AED', '#D97706', '#DC2626', '#0891B2', '#DB2777']
+                }]
+            }
+        });
+
+        // Enrollment Trend Chart (Line Chart)
+        new SimpleChart('enrollmentTrendChart', {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    data: [65, 78, 90, 105, 125, 142],
+                    backgroundColor: '#3B82F6',
+                    borderColor: '#2563EB'
+                }]
+            }
+        });
+
+        // Class Distribution Chart (Doughnut Chart)
+        new SimpleChart('classDistributionChart', {
+            type: 'doughnut',
+            data: {
+                labels: ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'],
+                datasets: [{
+                    data: [45, 52, 48, 50, 43],
+                    backgroundColor: ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444']
+                }]
+            }
+        });
+
+        // Grade Distribution Chart (Pie Chart)
+        new SimpleChart('gradeDistributionChart', {
+            type: 'pie',
+            data: {
+                labels: ['A+', 'A', 'B', 'C', 'D'],
+                datasets: [{
+                    data: [28, 45, 67, 32, 15],
+                    backgroundColor: ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444']
+                }]
+            }
+        });
     }
 };
 
@@ -485,43 +669,873 @@ const StudentsComponent = {
     }
 };
 
-// Simple placeholder components for other sections
+// Teachers Component - Full CRUD
 const TeachersComponent = {
-    render() {
-        $('#mainContent').innerHTML = `
+    teachers: [],
+    currentPage: 1,
+
+    async render() {
+        const content = $('#mainContent');
+        content.innerHTML = this.getTemplate();
+        await this.loadTeachers();
+        this.attachEventListeners();
+    },
+
+    getTemplate() {
+        return `
             <div class="px-4 sm:px-0">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Teachers</h2>
-                <div class="bg-white shadow rounded-lg p-6">
-                    <p class="text-gray-600">Teachers management interface (follow Students component pattern)</p>
+                <div class="sm:flex sm:items-center sm:justify-between mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Teachers</h2>
+                        <p class="mt-1 text-sm text-gray-500">Manage your teaching staff</p>
+                    </div>
+                    <button id="addTeacherBtn" class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-lg text-sm font-medium text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none transform hover:scale-105 transition-all">
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Add Teacher
+                    </button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="mb-4">
+                    <div class="relative rounded-lg shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" id="searchTeachers" placeholder="Search teachers by name or employee ID..."
+                            class="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-lg px-4 py-3">
+                    </div>
+                </div>
+
+                <!-- Teachers Table -->
+                <div class="bg-white shadow-lg rounded-2xl overflow-hidden">
+                    <div id="teachersTableContainer">
+                        <div class="text-center py-8">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-green-600 mx-auto"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
+    },
+
+    async loadTeachers(search = '') {
+        try {
+            const url = `/api/teachers?page=${this.currentPage}${search ? `&search=${search}` : ''}`;
+            const data = await API.get(url);
+            this.teachers = data.data;
+            this.renderTable(data);
+        } catch (error) {
+            $('#teachersTableContainer').innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="mx-auto h-12 w-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-red-600">Error: ${error.message}</p>
+                </div>
+            `;
+        }
+    },
+
+    renderTable(data) {
+        const container = $('#teachersTableContainer');
+        if (!this.teachers.length) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <p class="text-gray-500 mt-2">No teachers found</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gradient-to-r from-green-50 to-emerald-50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Teacher</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Employee ID</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Specialization</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Qualification</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    ${this.teachers.map(teacher => `
+                        <tr class="hover:bg-green-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-semibold shadow-lg">
+                                        ${teacher.user.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-semibold text-gray-900">${teacher.user.name}</div>
+                                        <div class="text-xs text-gray-500">${teacher.user.email}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm font-mono text-gray-900">${teacher.employee_id}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${teacher.specialization || 'N/A'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${teacher.qualification || 'N/A'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                                    ${teacher.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                    ${teacher.status}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button class="text-green-600 hover:text-green-900 mr-3" onclick="TeachersComponent.viewTeacher(${teacher.id})">View</button>
+                                <button class="text-red-600 hover:text-red-900" onclick="TeachersComponent.deleteTeacher(${teacher.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            <div class="bg-gray-50 px-4 py-3 border-t border-gray-200 sm:px-6">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-700">
+                        Showing <span class="font-medium">${data.from || 0}</span> to <span class="font-medium">${data.to || 0}</span> of
+                        <span class="font-medium">${data.total || 0}</span> results
+                    </div>
+                    <div class="flex space-x-2">
+                        ${data.prev_page_url ? `<button onclick="TeachersComponent.goToPage(${data.current_page - 1})" class="px-4 py-2 border rounded-lg bg-white hover:bg-green-50 text-green-600 font-medium transition-colors">Previous</button>` : ''}
+                        ${data.next_page_url ? `<button onclick="TeachersComponent.goToPage(${data.current_page + 1})" class="px-4 py-2 border rounded-lg bg-white hover:bg-green-50 text-green-600 font-medium transition-colors">Next</button>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    attachEventListeners() {
+        $('#addTeacherBtn').addEventListener('click', () => this.showAddModal());
+
+        let searchTimeout;
+        $('#searchTeachers').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                this.loadTeachers(e.target.value);
+            }, 300);
+        });
+    },
+
+    showAddModal() {
+        const modal = this.createTeacherModal();
+        $('#modalContainer').innerHTML = modal;
+        $('#teacherModal').classList.remove('hidden');
+        this.attachModalListeners();
+    },
+
+    createTeacherModal(teacher = null) {
+        const isEdit = teacher !== null;
+        return `
+            <div id="teacherModal" class="fixed z-10 inset-0 overflow-y-auto">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                    <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                        <form id="teacherForm">
+                            <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4">
+                                <h3 class="text-xl font-bold text-white">${isEdit ? 'Edit' : 'Add New'} Teacher</h3>
+                            </div>
+                            <div class="bg-white px-6 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Full Name *</label>
+                                        <input type="text" name="name" required
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                            value="${teacher?.user?.name || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Email *</label>
+                                        <input type="email" name="email" required
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                            value="${teacher?.user?.email || ''}">
+                                    </div>
+                                    ${!isEdit ? `
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Password *</label>
+                                        <input type="password" name="password" required
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
+                                    </div>
+                                    ` : ''}
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Employee ID *</label>
+                                        <input type="text" name="employee_id" required
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                            value="${teacher?.employee_id || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Phone</label>
+                                        <input type="tel" name="phone"
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                            value="${teacher?.user?.phone || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Qualification</label>
+                                        <input type="text" name="qualification"
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                            placeholder="e.g., M.Ed, B.Ed"
+                                            value="${teacher?.qualification || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Specialization</label>
+                                        <input type="text" name="specialization"
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                            placeholder="e.g., Mathematics, Science"
+                                            value="${teacher?.specialization || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Date of Joining</label>
+                                        <input type="date" name="date_of_joining"
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                            value="${teacher?.date_of_joining || ''}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button type="submit"
+                                    class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-base font-medium text-white hover:from-green-600 hover:to-emerald-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transform hover:scale-105 transition-all">
+                                    ${isEdit ? 'Update' : 'Create'}
+                                </button>
+                                <button type="button" id="closeModal"
+                                    class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    attachModalListeners() {
+        $('#closeModal').addEventListener('click', () => {
+            $('#modalContainer').innerHTML = '';
+        });
+
+        $('#teacherForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                await API.post('/api/teachers', data);
+                $('#modalContainer').innerHTML = '';
+                await this.loadTeachers();
+                this.showNotification('Teacher added successfully!', 'success');
+            } catch (error) {
+                this.showNotification('Error: ' + error.message, 'error');
+            }
+        });
+    },
+
+    async deleteTeacher(id) {
+        if (!confirm('Are you sure you want to delete this teacher?')) return;
+
+        try {
+            await API.delete(`/api/teachers/${id}`);
+            await this.loadTeachers();
+            this.showNotification('Teacher deleted successfully', 'success');
+        } catch (error) {
+            this.showNotification('Error: ' + error.message, 'error');
+        }
+    },
+
+    async viewTeacher(id) {
+        alert('View teacher details - ID: ' + id);
+    },
+
+    goToPage(page) {
+        this.currentPage = page;
+        this.loadTeachers();
+    },
+
+    showNotification(message, type) {
+        const notification = createElement('div', {
+            className: `fixed top-4 right-4 px-6 py-4 rounded-xl shadow-2xl text-white ${type === 'success' ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gradient-to-r from-red-500 to-red-600'} fade-in z-50 transform hover:scale-105 transition-all`
+        }, message);
+
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 };
 
 const ClassesComponent = {
-    render() {
-        $('#mainContent').innerHTML = `
+    classes: [],
+    currentPage: 1,
+
+    async render() {
+        const content = $('#mainContent');
+        content.innerHTML = this.getTemplate();
+        await this.loadClasses();
+        this.attachEventListeners();
+    },
+
+    getTemplate() {
+        return `
             <div class="px-4 sm:px-0">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Classes</h2>
-                <div class="bg-white shadow rounded-lg p-6">
-                    <p class="text-gray-600">Classes management interface (follow Students component pattern)</p>
+                <div class="sm:flex sm:items-center sm:justify-between mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Classes</h2>
+                        <p class="mt-1 text-sm text-gray-500">Manage school classes and grades</p>
+                    </div>
+                    <button id="addClassBtn" class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-lg text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 focus:outline-none transform hover:scale-105 transition-all">
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Add Class
+                    </button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="mb-4">
+                    <div class="relative rounded-lg shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" id="searchClasses" placeholder="Search classes..."
+                            class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-lg px-4 py-3">
+                    </div>
+                </div>
+
+                <!-- Classes Grid -->
+                <div id="classesGridContainer">
+                    <div class="text-center py-8">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-purple-600 mx-auto"></div>
+                    </div>
                 </div>
             </div>
         `;
+    },
+
+    async loadClasses(search = '') {
+        try {
+            const url = `/api/classes?page=${this.currentPage}${search ? `&search=${search}` : ''}`;
+            const data = await API.get(url);
+            this.classes = data.data;
+            this.renderGrid(data);
+        } catch (error) {
+            $('#classesGridContainer').innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="mx-auto h-12 w-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-red-600">Error: ${error.message}</p>
+                </div>
+            `;
+        }
+    },
+
+    renderGrid(data) {
+        const container = $('#classesGridContainer');
+        if (!this.classes.length) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                    <p class="text-gray-500 mt-2">No classes found</p>
+                </div>
+            `;
+            return;
+        }
+
+        const gradientColors = [
+            'from-blue-500 to-blue-600',
+            'from-green-500 to-emerald-600',
+            'from-purple-500 to-purple-600',
+            'from-pink-500 to-rose-600',
+            'from-yellow-500 to-orange-500',
+            'from-indigo-500 to-indigo-600'
+        ];
+
+        container.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                ${this.classes.map((cls, index) => {
+                    const gradient = gradientColors[index % gradientColors.length];
+                    return `
+                        <div class="bg-white rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 hover:shadow-2xl">
+                            <div class="bg-gradient-to-br ${gradient} px-6 py-8 text-white">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="text-2xl font-bold">${cls.name}</h3>
+                                        <p class="text-sm opacity-90 mt-1">Grade ${cls.grade_level || 'N/A'}</p>
+                                    </div>
+                                    <div class="bg-white bg-opacity-20 rounded-full p-3">
+                                        <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="px-6 py-4">
+                                <div class="space-y-3">
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <svg class="h-5 w-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                        </svg>
+                                        <span class="font-medium">${cls.students_count || 0}</span>&nbsp;Students
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <svg class="h-5 w-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                        </svg>
+                                        <span>${cls.subjects_count || 0}</span>&nbsp;Subjects
+                                    </div>
+                                    ${cls.teacher_name ? `
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <svg class="h-5 w-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                        </svg>
+                                        ${cls.teacher_name}
+                                    </div>
+                                    ` : ''}
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-gray-200 flex justify-between">
+                                    <button onclick="ClassesComponent.viewClass(${cls.id})" class="text-purple-600 hover:text-purple-900 text-sm font-medium">View Details</button>
+                                    <button onclick="ClassesComponent.deleteClass(${cls.id})" class="text-red-600 hover:text-red-900 text-sm font-medium">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+
+            <div class="bg-white rounded-lg shadow px-4 py-3">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-700">
+                        Showing <span class="font-medium">${data.from || 0}</span> to <span class="font-medium">${data.to || 0}</span> of
+                        <span class="font-medium">${data.total || 0}</span> results
+                    </div>
+                    <div class="flex space-x-2">
+                        ${data.prev_page_url ? `<button onclick="ClassesComponent.goToPage(${data.current_page - 1})" class="px-4 py-2 border rounded-lg bg-white hover:bg-purple-50 text-purple-600 font-medium transition-colors">Previous</button>` : ''}
+                        ${data.next_page_url ? `<button onclick="ClassesComponent.goToPage(${data.current_page + 1})" class="px-4 py-2 border rounded-lg bg-white hover:bg-purple-50 text-purple-600 font-medium transition-colors">Next</button>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    attachEventListeners() {
+        $('#addClassBtn').addEventListener('click', () => this.showAddModal());
+
+        let searchTimeout;
+        $('#searchClasses').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                this.loadClasses(e.target.value);
+            }, 300);
+        });
+    },
+
+    showAddModal() {
+        const modal = this.createClassModal();
+        $('#modalContainer').innerHTML = modal;
+        $('#classModal').classList.remove('hidden');
+        this.attachModalListeners();
+    },
+
+    createClassModal(cls = null) {
+        const isEdit = cls !== null;
+        return `
+            <div id="classModal" class="fixed z-10 inset-0 overflow-y-auto">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                    <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                        <form id="classForm">
+                            <div class="bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-4">
+                                <h3 class="text-xl font-bold text-white">${isEdit ? 'Edit' : 'Add New'} Class</h3>
+                            </div>
+                            <div class="bg-white px-6 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Class Name *</label>
+                                        <input type="text" name="name" required
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                                            placeholder="e.g., Grade 10-A"
+                                            value="${cls?.name || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Grade Level</label>
+                                        <input type="number" name="grade_level" min="1" max="12"
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                                            placeholder="1-12"
+                                            value="${cls?.grade_level || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Section</label>
+                                        <input type="text" name="section"
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                                            placeholder="e.g., A, B, C"
+                                            value="${cls?.section || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Academic Year</label>
+                                        <input type="text" name="academic_year"
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                                            placeholder="e.g., 2024-2025"
+                                            value="${cls?.academic_year || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Max Capacity</label>
+                                        <input type="number" name="max_capacity"
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                                            placeholder="e.g., 40"
+                                            value="${cls?.max_capacity || ''}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button type="submit"
+                                    class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-base font-medium text-white hover:from-purple-600 hover:to-pink-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transform hover:scale-105 transition-all">
+                                    ${isEdit ? 'Update' : 'Create'}
+                                </button>
+                                <button type="button" id="closeModal"
+                                    class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    attachModalListeners() {
+        $('#closeModal').addEventListener('click', () => {
+            $('#modalContainer').innerHTML = '';
+        });
+
+        $('#classForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                await API.post('/api/classes', data);
+                $('#modalContainer').innerHTML = '';
+                await this.loadClasses();
+                this.showNotification('Class added successfully!', 'success');
+            } catch (error) {
+                this.showNotification('Error: ' + error.message, 'error');
+            }
+        });
+    },
+
+    async deleteClass(id) {
+        if (!confirm('Are you sure you want to delete this class?')) return;
+
+        try {
+            await API.delete(`/api/classes/${id}`);
+            await this.loadClasses();
+            this.showNotification('Class deleted successfully', 'success');
+        } catch (error) {
+            this.showNotification('Error: ' + error.message, 'error');
+        }
+    },
+
+    async viewClass(id) {
+        alert('View class details - ID: ' + id);
+    },
+
+    goToPage(page) {
+        this.currentPage = page;
+        this.loadClasses();
+    },
+
+    showNotification(message, type) {
+        const notification = createElement('div', {
+            className: `fixed top-4 right-4 px-6 py-4 rounded-xl shadow-2xl text-white ${type === 'success' ? 'bg-gradient-to-r from-purple-500 to-pink-600' : 'bg-gradient-to-r from-red-500 to-red-600'} fade-in z-50 transform hover:scale-105 transition-all`
+        }, message);
+
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 };
 
 const SubjectsComponent = {
-    render() {
-        $('#mainContent').innerHTML = `
+    subjects: [],
+    currentPage: 1,
+
+    async render() {
+        const content = $('#mainContent');
+        content.innerHTML = this.getTemplate();
+        await this.loadSubjects();
+        this.attachEventListeners();
+    },
+
+    getTemplate() {
+        return `
             <div class="px-4 sm:px-0">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Subjects</h2>
-                <div class="bg-white shadow rounded-lg p-6">
-                    <p class="text-gray-600">Subjects management interface (follow Students component pattern)</p>
+                <div class="sm:flex sm:items-center sm:justify-between mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">Subjects</h2>
+                        <p class="mt-1 text-sm text-gray-500">Manage curriculum and subjects</p>
+                    </div>
+                    <button id="addSubjectBtn" class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-lg text-sm font-medium text-white bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 focus:outline-none transform hover:scale-105 transition-all">
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Add Subject
+                    </button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="mb-4">
+                    <div class="relative rounded-lg shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" id="searchSubjects" placeholder="Search subjects..."
+                            class="shadow-sm focus:ring-yellow-500 focus:border-yellow-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-lg px-4 py-3">
+                    </div>
+                </div>
+
+                <!-- Subjects Grid -->
+                <div id="subjectsGridContainer">
+                    <div class="text-center py-8">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-yellow-600 mx-auto"></div>
+                    </div>
                 </div>
             </div>
         `;
+    },
+
+    async loadSubjects(search = '') {
+        try {
+            const url = `/api/subjects?page=${this.currentPage}${search ? `&search=${search}` : ''}`;
+            const data = await API.get(url);
+            this.subjects = data.data;
+            this.renderGrid(data);
+        } catch (error) {
+            $('#subjectsGridContainer').innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="mx-auto h-12 w-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-red-600">Error: ${error.message}</p>
+                </div>
+            `;
+        }
+    },
+
+    renderGrid(data) {
+        const container = $('#subjectsGridContainer');
+        if (!this.subjects.length) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    <p class="text-gray-500 mt-2">No subjects found</p>
+                </div>
+            `;
+            return;
+        }
+
+        const icons = ['📚', '🔬', '🧮', '🌍', '🎨', '💻', '⚛️', '📖', '🎭', '🎵'];
+
+        container.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+                ${this.subjects.map((subject, index) => `
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-105 transition-all duration-300 hover:shadow-xl border-l-4 border-yellow-500">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="text-4xl">${icons[index % icons.length]}</div>
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold ${subject.is_compulsory ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'}">
+                                    ${subject.is_compulsory ? 'Required' : 'Elective'}
+                                </span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">${subject.name}</h3>
+                            <p class="text-sm text-gray-600 mb-3">${subject.code || 'No code'}</p>
+                            <div class="flex items-center text-xs text-gray-500 mb-3">
+                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                ${subject.credits || 0} Credits
+                            </div>
+                            <div class="pt-3 border-t border-gray-200 flex justify-between">
+                                <button onclick="SubjectsComponent.viewSubject(${subject.id})" class="text-yellow-600 hover:text-yellow-800 text-sm font-medium">View</button>
+                                <button onclick="SubjectsComponent.deleteSubject(${subject.id})" class="text-red-600 hover:text-red-800 text-sm font-medium">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <div class="bg-white rounded-lg shadow px-4 py-3">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-700">
+                        Showing <span class="font-medium">${data.from || 0}</span> to <span class="font-medium">${data.to || 0}</span> of
+                        <span class="font-medium">${data.total || 0}</span> results
+                    </div>
+                    <div class="flex space-x-2">
+                        ${data.prev_page_url ? `<button onclick="SubjectsComponent.goToPage(${data.current_page - 1})" class="px-4 py-2 border rounded-lg bg-white hover:bg-yellow-50 text-yellow-600 font-medium transition-colors">Previous</button>` : ''}
+                        ${data.next_page_url ? `<button onclick="SubjectsComponent.goToPage(${data.current_page + 1})" class="px-4 py-2 border rounded-lg bg-white hover:bg-yellow-50 text-yellow-600 font-medium transition-colors">Next</button>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    attachEventListeners() {
+        $('#addSubjectBtn').addEventListener('click', () => this.showAddModal());
+
+        let searchTimeout;
+        $('#searchSubjects').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                this.loadSubjects(e.target.value);
+            }, 300);
+        });
+    },
+
+    showAddModal() {
+        const modal = this.createSubjectModal();
+        $('#modalContainer').innerHTML = modal;
+        $('#subjectModal').classList.remove('hidden');
+        this.attachModalListeners();
+    },
+
+    createSubjectModal(subject = null) {
+        const isEdit = subject !== null;
+        return `
+            <div id="subjectModal" class="fixed z-10 inset-0 overflow-y-auto">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                    <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                        <form id="subjectForm">
+                            <div class="bg-gradient-to-r from-yellow-500 to-orange-500 px-6 py-4">
+                                <h3 class="text-xl font-bold text-white">${isEdit ? 'Edit' : 'Add New'} Subject</h3>
+                            </div>
+                            <div class="bg-white px-6 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Subject Name *</label>
+                                        <input type="text" name="name" required
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
+                                            placeholder="e.g., Mathematics"
+                                            value="${subject?.name || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Subject Code</label>
+                                        <input type="text" name="code"
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
+                                            placeholder="e.g., MATH-101"
+                                            value="${subject?.code || ''}">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Description</label>
+                                        <textarea name="description" rows="3"
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
+                                            placeholder="Subject description...">${subject?.description || ''}</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Credits</label>
+                                        <input type="number" name="credits" min="0"
+                                            class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm"
+                                            placeholder="e.g., 4"
+                                            value="${subject?.credits || ''}">
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="is_compulsory" id="is_compulsory"
+                                            class="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
+                                            ${subject?.is_compulsory ? 'checked' : ''}>
+                                        <label for="is_compulsory" class="ml-2 block text-sm text-gray-900">
+                                            Compulsory Subject
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button type="submit"
+                                    class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-base font-medium text-white hover:from-yellow-600 hover:to-orange-600 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transform hover:scale-105 transition-all">
+                                    ${isEdit ? 'Update' : 'Create'}
+                                </button>
+                                <button type="button" id="closeModal"
+                                    class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    attachModalListeners() {
+        $('#closeModal').addEventListener('click', () => {
+            $('#modalContainer').innerHTML = '';
+        });
+
+        $('#subjectForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            data.is_compulsory = $('#is_compulsory').checked ? 1 : 0;
+
+            try {
+                await API.post('/api/subjects', data);
+                $('#modalContainer').innerHTML = '';
+                await this.loadSubjects();
+                this.showNotification('Subject added successfully!', 'success');
+            } catch (error) {
+                this.showNotification('Error: ' + error.message, 'error');
+            }
+        });
+    },
+
+    async deleteSubject(id) {
+        if (!confirm('Are you sure you want to delete this subject?')) return;
+
+        try {
+            await API.delete(`/api/subjects/${id}`);
+            await this.loadSubjects();
+            this.showNotification('Subject deleted successfully', 'success');
+        } catch (error) {
+            this.showNotification('Error: ' + error.message, 'error');
+        }
+    },
+
+    async viewSubject(id) {
+        alert('View subject details - ID: ' + id);
+    },
+
+    goToPage(page) {
+        this.currentPage = page;
+        this.loadSubjects();
+    },
+
+    showNotification(message, type) {
+        const notification = createElement('div', {
+            className: `fixed top-4 right-4 px-6 py-4 rounded-xl shadow-2xl text-white ${type === 'success' ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-gradient-to-r from-red-500 to-red-600'} fade-in z-50 transform hover:scale-105 transition-all`
+        }, message);
+
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 };
 
@@ -678,4 +1692,7 @@ const SchoolApp = {
 
 // Make components globally accessible for onclick handlers
 window.StudentsComponent = StudentsComponent;
+window.TeachersComponent = TeachersComponent;
+window.ClassesComponent = ClassesComponent;
+window.SubjectsComponent = SubjectsComponent;
 window.SchoolApp = SchoolApp;
