@@ -83,17 +83,23 @@ class DatabaseSeeder extends Seeder
 
         // Create classes
         $classes = [
-            ['name' => 'Grade 1-A', 'grade_level' => 1, 'section' => 'A', 'academic_year' => '2024-2025', 'max_capacity' => 40],
-            ['name' => 'Grade 1-B', 'grade_level' => 1, 'section' => 'B', 'academic_year' => '2024-2025', 'max_capacity' => 40],
-            ['name' => 'Grade 2-A', 'grade_level' => 2, 'section' => 'A', 'academic_year' => '2024-2025', 'max_capacity' => 40],
-            ['name' => 'Grade 3-A', 'grade_level' => 3, 'section' => 'A', 'academic_year' => '2024-2025', 'max_capacity' => 40],
-            ['name' => 'Grade 4-A', 'grade_level' => 4, 'section' => 'A', 'academic_year' => '2024-2025', 'max_capacity' => 40],
-            ['name' => 'Grade 5-A', 'grade_level' => 5, 'section' => 'A', 'academic_year' => '2024-2025', 'max_capacity' => 40],
+            ['name' => 'Grade 1-A', 'grade_level' => '1', 'section' => 'A', 'academic_year' => '2024-2025', 'capacity' => 40, 'room_number' => '101', 'status' => 'active'],
+            ['name' => 'Grade 1-B', 'grade_level' => '1', 'section' => 'B', 'academic_year' => '2024-2025', 'capacity' => 40, 'room_number' => '102', 'status' => 'active'],
+            ['name' => 'Grade 2-A', 'grade_level' => '2', 'section' => 'A', 'academic_year' => '2024-2025', 'capacity' => 40, 'room_number' => '201', 'status' => 'active'],
+            ['name' => 'Grade 3-A', 'grade_level' => '3', 'section' => 'A', 'academic_year' => '2024-2025', 'capacity' => 40, 'room_number' => '301', 'status' => 'active'],
+            ['name' => 'Grade 4-A', 'grade_level' => '4', 'section' => 'A', 'academic_year' => '2024-2025', 'capacity' => 40, 'room_number' => '401', 'status' => 'active'],
+            ['name' => 'Grade 5-A', 'grade_level' => '5', 'section' => 'A', 'academic_year' => '2024-2025', 'capacity' => 40, 'room_number' => '501', 'status' => 'active'],
         ];
 
         $createdClasses = [];
-        foreach ($classes as $class) {
-            $createdClasses[] = SchoolClass::create($class);
+        $classIndex = 0;
+        foreach ($classes as $classData) {
+            // Assign a teacher to each class
+            if ($classIndex < count($teachers)) {
+                $classData['teacher_id'] = $teachers[$classIndex]->id;
+            }
+            $createdClasses[] = SchoolClass::create($classData);
+            $classIndex++;
         }
 
         // Create students
@@ -167,10 +173,11 @@ class DatabaseSeeder extends Seeder
                         'student_id' => $student->id,
                         'subject_id' => $subject->id,
                         'class_id' => $class->id,
-                        'exam_type' => 'midterm',
+                        'exam_type' => 'Midterm',
                         'marks_obtained' => $midtermMarks,
                         'total_marks' => 100,
                         'grade' => $this->calculateGrade($midtermMarks),
+                        'academic_year' => '2024-2025',
                         'remarks' => $midtermMarks >= 80 ? 'Excellent' : ($midtermMarks >= 60 ? 'Good' : 'Needs Improvement'),
                     ]);
 
@@ -180,10 +187,11 @@ class DatabaseSeeder extends Seeder
                         'student_id' => $student->id,
                         'subject_id' => $subject->id,
                         'class_id' => $class->id,
-                        'exam_type' => 'final',
+                        'exam_type' => 'Final',
                         'marks_obtained' => $finalMarks,
                         'total_marks' => 100,
                         'grade' => $this->calculateGrade($finalMarks),
+                        'academic_year' => '2024-2025',
                         'remarks' => $finalMarks >= 80 ? 'Excellent' : ($finalMarks >= 60 ? 'Good' : 'Needs Improvement'),
                     ]);
                 }
