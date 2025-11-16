@@ -32,14 +32,14 @@ class DatabaseSeeder extends Seeder
 
         // Create subjects
         $subjects = [
-            ['name' => 'Mathematics', 'code' => 'MATH101', 'description' => 'Basic Mathematics', 'credits' => 4, 'is_compulsory' => true],
-            ['name' => 'English', 'code' => 'ENG101', 'description' => 'English Language', 'credits' => 3, 'is_compulsory' => true],
-            ['name' => 'Science', 'code' => 'SCI101', 'description' => 'General Science', 'credits' => 4, 'is_compulsory' => true],
-            ['name' => 'History', 'code' => 'HIST101', 'description' => 'World History', 'credits' => 3, 'is_compulsory' => true],
-            ['name' => 'Geography', 'code' => 'GEO101', 'description' => 'Physical and Human Geography', 'credits' => 3, 'is_compulsory' => true],
-            ['name' => 'Physical Education', 'code' => 'PE101', 'description' => 'Physical Education', 'credits' => 2, 'is_compulsory' => false],
-            ['name' => 'Art', 'code' => 'ART101', 'description' => 'Visual Arts', 'credits' => 2, 'is_compulsory' => false],
-            ['name' => 'Computer Science', 'code' => 'CS101', 'description' => 'Introduction to Computing', 'credits' => 3, 'is_compulsory' => false],
+            ['name' => 'Mathematics', 'code' => 'MATH101', 'description' => 'Basic Mathematics', 'credits' => 4, 'status' => 'active'],
+            ['name' => 'English', 'code' => 'ENG101', 'description' => 'English Language', 'credits' => 3, 'status' => 'active'],
+            ['name' => 'Science', 'code' => 'SCI101', 'description' => 'General Science', 'credits' => 4, 'status' => 'active'],
+            ['name' => 'History', 'code' => 'HIST101', 'description' => 'World History', 'credits' => 3, 'status' => 'active'],
+            ['name' => 'Geography', 'code' => 'GEO101', 'description' => 'Physical and Human Geography', 'credits' => 3, 'status' => 'active'],
+            ['name' => 'Physical Education', 'code' => 'PE101', 'description' => 'Physical Education', 'credits' => 2, 'status' => 'active'],
+            ['name' => 'Art', 'code' => 'ART101', 'description' => 'Visual Arts', 'credits' => 2, 'status' => 'active'],
+            ['name' => 'Computer Science', 'code' => 'CS101', 'description' => 'Introduction to Computing', 'credits' => 3, 'status' => 'active'],
         ];
 
         $createdSubjects = [];
