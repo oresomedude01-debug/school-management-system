@@ -26,41 +26,49 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/api/dashboard/stats', [DashboardController::class, 'stats']);
 
-    // Students
+    // Page Routes (render views with layout)
+    Route::get('/students', function () { return view('students.index'); })->name('students');
+    Route::get('/teachers', function () { return view('teachers.index'); })->name('teachers');
+    Route::get('/classes', function () { return view('classes.index'); })->name('classes');
+    Route::get('/subjects', function () { return view('subjects.index'); })->name('subjects');
+    Route::get('/attendance', function () { return view('attendance.index'); })->name('attendance');
+    Route::get('/grades', function () { return view('grades.index'); })->name('grades');
+
+    // Students API
     Route::get('/api/students', [StudentController::class, 'index']);
     Route::post('/api/students', [StudentController::class, 'store']);
     Route::get('/api/students/{student}', [StudentController::class, 'show']);
     Route::put('/api/students/{student}', [StudentController::class, 'update']);
     Route::delete('/api/students/{student}', [StudentController::class, 'destroy']);
 
-    // Teachers
+    // Teachers API
     Route::get('/api/teachers', [TeacherController::class, 'index']);
     Route::post('/api/teachers', [TeacherController::class, 'store']);
     Route::get('/api/teachers/{teacher}', [TeacherController::class, 'show']);
     Route::put('/api/teachers/{teacher}', [TeacherController::class, 'update']);
     Route::delete('/api/teachers/{teacher}', [TeacherController::class, 'destroy']);
 
-    // Classes
+    // Classes API
     Route::get('/api/classes', [ClassController::class, 'index']);
     Route::post('/api/classes', [ClassController::class, 'store']);
     Route::get('/api/classes/{class}', [ClassController::class, 'show']);
     Route::put('/api/classes/{class}', [ClassController::class, 'update']);
     Route::delete('/api/classes/{class}', [ClassController::class, 'destroy']);
 
-    // Subjects
+    // Subjects API
     Route::get('/api/subjects', [SubjectController::class, 'index']);
     Route::post('/api/subjects', [SubjectController::class, 'store']);
     Route::get('/api/subjects/{subject}', [SubjectController::class, 'show']);
     Route::put('/api/subjects/{subject}', [SubjectController::class, 'update']);
     Route::delete('/api/subjects/{subject}', [SubjectController::class, 'destroy']);
 
-    // Attendance
+    // Attendance API
     Route::get('/api/attendance', [AttendanceController::class, 'index']);
     Route::post('/api/attendance', [AttendanceController::class, 'store']);
     Route::get('/api/attendance/{attendance}', [AttendanceController::class, 'show']);
     Route::put('/api/attendance/{attendance}', [AttendanceController::class, 'update']);
 
-    // Grades
+    // Grades API
     Route::get('/api/grades', [GradeController::class, 'index']);
     Route::post('/api/grades', [GradeController::class, 'store']);
     Route::get('/api/grades/{grade}', [GradeController::class, 'show']);
