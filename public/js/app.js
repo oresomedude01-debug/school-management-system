@@ -1540,28 +1540,636 @@ const SubjectsComponent = {
 };
 
 const AttendanceComponent = {
-    render() {
-        $('#mainContent').innerHTML = `
+    currentMonth: new Date(),
+    selectedDate: new Date().toISOString().split('T')[0],
+    selectedClass: null,
+    students: [],
+
+    async render() {
+        const content = $('#mainContent');
+        content.innerHTML = this.getTemplate();
+        await this.loadClasses();
+        this.renderCalendar();
+        this.attachEventListeners();
+    },
+
+    getTemplate() {
+        const today = new Date().toLocaleDateString();
+        return `
             <div class="px-4 sm:px-0">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Attendance</h2>
-                <div class="bg-white shadow rounded-lg p-6">
-                    <p class="text-gray-600">Attendance tracking interface</p>
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">Attendance Management</h2>
+                    <p class="mt-1 text-sm text-gray-500">Track and manage student attendance</p>
+                </div>
+
+                <div class="bg-white shadow-lg rounded-2xl p-6 mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Class</label>
+                    <select id="classSelect" class="block w-full border border-gray-300 rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Choose a class...</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="lg:col-span-2 bg-white shadow-lg rounded-2xl overflow-hidden">
+                        <div class="bg-gradient-to-r from-indigo-500 to-blue-600 px-6 py-4">
+                            <div class="flex justify-between items-center">
+                                <button id="prevMonth" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg px-3 py-2 transition-all">
+                                    ←
+                                </button>
+                                <h3 class="text-xl font-bold text-white" id="currentMonthYear"></h3>
+                                <button id="nextMonth" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg px-3 py-2 transition-all">
+                                    →
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div id="calendarGrid"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white shadow-lg rounded-2xl overflow-hidden">
+                        <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4">
+                            <h3 class="text-lg font-bold text-white">Quick Mark</h3>
+                            <p class="text-sm text-white opacity-90">Selected: <span id="selectedDateDisplay">${today}</span></p>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-3">
+                                <button id="markAllPresent" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 transition-all shadow-lg">
+                                    ✓ Mark All Present
+                                </button>
+                                <button id="markAllAbsent" class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-3 rounded-xl font-semibold hover:from-red-600 hover:to-red-700 transform hover:scale-105 transition-all shadow-lg">
+                                    ✗ Mark All Absent
+                                </button>
+                                <button id="viewTodayAttendance" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transform hover:scale-105 transition-all shadow-lg">
+                                    👁 View Attendance
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="studentsAttendanceList" class="bg-white shadow-lg rounded-2xl overflow-hidden hidden">
+                    <div class="px-6 py-5 border-b border-gray-200">
+                        <h3 class="text-lg leading-6 font-bold text-gray-900">Mark Attendance</h3>
+                        <p class="text-sm text-gray-500">Click on each student to toggle attendance</p>
+                    </div>
+                    <div id="studentsListContainer" class="p-6">
+                        <div class="text-center py-8 text-gray-500">
+                            Select a class and date to mark attendance
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
+    },
+
+    async loadClasses() {
+        try {
+            const data = await API.get('/api/classes');
+            const select = $('#classSelect');
+            data.data.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls.id;
+                option.textContent = cls.name;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            this.showNotification('Error loading classes: ' + error.message, 'error');
+        }
+    },
+
+    renderCalendar() {
+        const year = this.currentMonth.getFullYear();
+        const month = this.currentMonth.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date().toISOString().split('T')[0];
+
+        $('#currentMonthYear').textContent = this.currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+        let html = '<div class="grid grid-cols-7 gap-2 mb-2">';
+        ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+            html += `<div class="font-bold text-center p-2 text-gray-600 text-sm">${day}</div>`;
+        });
+        html += '</div><div class="grid grid-cols-7 gap-2">';
+
+        for (let i = 0; i < firstDay; i++) {
+            html += '<div class="p-2"></div>';
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isToday = date === today;
+            const isSelected = date === this.selectedDate;
+
+            html += `
+                <div class="border rounded-lg p-3 text-center cursor-pointer transition-all
+                    ${isToday ? 'border-indigo-500 bg-indigo-50' : 'hover:bg-gray-50'}
+                    ${isSelected ? 'bg-indigo-500 text-white font-bold' : 'hover:border-indigo-300'}
+                    transform hover:scale-105"
+                    data-date="${date}"
+                    onclick="AttendanceComponent.selectDate('${date}')">
+                    <div class="text-sm">${day}</div>
+                </div>
+            `;
+        }
+
+        html += '</div>';
+        $('#calendarGrid').innerHTML = html;
+    },
+
+    selectDate(date) {
+        this.selectedDate = date;
+        $('#selectedDateDisplay').textContent = new Date(date).toLocaleDateString();
+        this.renderCalendar();
+
+        if (this.selectedClass) {
+            this.loadStudentsForAttendance();
+        }
+    },
+
+    async loadStudentsForAttendance() {
+        if (!this.selectedClass) {
+            this.showNotification('Please select a class first', 'error');
+            return;
+        }
+
+        try {
+            const data = await API.get(`/api/students?class_id=${this.selectedClass}`);
+            this.students = data.data || [];
+            this.renderStudentsList();
+            $('#studentsAttendanceList').classList.remove('hidden');
+        } catch (error) {
+            this.showNotification('Error loading students: ' + error.message, 'error');
+        }
+    },
+
+    renderStudentsList() {
+        const container = $('#studentsListContainer');
+
+        if (!this.students.length) {
+            container.innerHTML = '<div class="text-center py-8 text-gray-500">No students found in this class</div>';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                ${this.students.map(student => `
+                    <div id="student-${student.id}"
+                         onclick="AttendanceComponent.toggleAttendance(${student.id})"
+                         class="attendance-card bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all transform hover:scale-105"
+                         data-status="present">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                    ${student.user.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">${student.user.name}</p>
+                                    <p class="text-sm text-gray-500">${student.admission_number}</p>
+                                </div>
+                            </div>
+                            <div class="attendance-icon text-4xl">✓</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button onclick="AttendanceComponent.submitAttendance()"
+                        class="bg-gradient-to-r from-indigo-500 to-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg">
+                    Save Attendance
+                </button>
+            </div>
+        `;
+    },
+
+    toggleAttendance(studentId) {
+        const card = $(`#student-${studentId}`);
+        const currentStatus = card.dataset.status;
+        const newStatus = currentStatus === 'present' ? 'absent' : 'present';
+
+        card.dataset.status = newStatus;
+
+        if (newStatus === 'present') {
+            card.classList.remove('border-red-300', 'bg-red-50');
+            card.classList.add('border-gray-200', 'bg-white');
+            card.querySelector('.attendance-icon').textContent = '✓';
+            card.querySelector('.attendance-icon').classList.remove('text-red-500');
+            card.querySelector('.attendance-icon').classList.add('text-green-500');
+        } else {
+            card.classList.remove('border-gray-200', 'bg-white');
+            card.classList.add('border-red-300', 'bg-red-50');
+            card.querySelector('.attendance-icon').textContent = '✗';
+            card.querySelector('.attendance-icon').classList.remove('text-green-500');
+            card.querySelector('.attendance-icon').classList.add('text-red-500');
+        }
+    },
+
+    async submitAttendance() {
+        const attendanceData = [];
+
+        $$('.attendance-card').forEach(card => {
+            const studentId = card.id.split('-')[1];
+            const status = card.dataset.status;
+            attendanceData.push({
+                student_id: studentId,
+                date: this.selectedDate,
+                status: status,
+                class_id: this.selectedClass
+            });
+        });
+
+        try {
+            await API.post('/api/attendance', { attendance: attendanceData });
+            this.showNotification('Attendance saved successfully!', 'success');
+        } catch (error) {
+            this.showNotification('Error saving attendance: ' + error.message, 'error');
+        }
+    },
+
+    markAll(status) {
+        if (!this.selectedClass) {
+            this.showNotification('Please select a class first', 'error');
+            return;
+        }
+
+        $$('.attendance-card').forEach(card => {
+            card.dataset.status = status;
+
+            if (status === 'present') {
+                card.classList.remove('border-red-300', 'bg-red-50');
+                card.classList.add('border-gray-200', 'bg-white');
+                card.querySelector('.attendance-icon').textContent = '✓';
+                card.querySelector('.attendance-icon').classList.remove('text-red-500');
+                card.querySelector('.attendance-icon').classList.add('text-green-500');
+            } else {
+                card.classList.remove('border-gray-200', 'bg-white');
+                card.classList.add('border-red-300', 'bg-red-50');
+                card.querySelector('.attendance-icon').textContent = '✗';
+                card.querySelector('.attendance-icon').classList.remove('text-green-500');
+                card.querySelector('.attendance-icon').classList.add('text-red-500');
+            }
+        });
+    },
+
+    attachEventListeners() {
+        $('#prevMonth').addEventListener('click', () => {
+            this.currentMonth.setMonth(this.currentMonth.getMonth() - 1);
+            this.renderCalendar();
+        });
+
+        $('#nextMonth').addEventListener('click', () => {
+            this.currentMonth.setMonth(this.currentMonth.getMonth() + 1);
+            this.renderCalendar();
+        });
+
+        $('#classSelect').addEventListener('change', (e) => {
+            this.selectedClass = e.target.value;
+            if (this.selectedClass) {
+                this.loadStudentsForAttendance();
+            }
+        });
+
+        $('#markAllPresent').addEventListener('click', () => this.markAll('present'));
+        $('#markAllAbsent').addEventListener('click', () => this.markAll('absent'));
+        $('#viewTodayAttendance').addEventListener('click', () => this.loadStudentsForAttendance());
+    },
+
+    showNotification(message, type) {
+        const notification = createElement('div', {
+            className: `fixed top-4 right-4 px-6 py-4 rounded-xl shadow-2xl text-white ${type === 'success' ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gradient-to-r from-red-500 to-red-600'} fade-in z-50 transform hover:scale-105 transition-all`
+        }, message);
+
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 };
 
 const GradesComponent = {
-    render() {
-        $('#mainContent').innerHTML = `
+    grades: [],
+    currentPage: 1,
+    selectedClass: null,
+    selectedSubject: null,
+
+    async render() {
+        const content = $('#mainContent');
+        content.innerHTML = this.getTemplate();
+        await this.loadFilters();
+        this.attachEventListeners();
+    },
+
+    getTemplate() {
+        return `
             <div class="px-4 sm:px-0">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Grades</h2>
-                <div class="bg-white shadow rounded-lg p-6">
-                    <p class="text-gray-600">Grades management interface</p>
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">Grades & Report Cards</h2>
+                    <p class="mt-1 text-sm text-gray-500">Manage student grades and generate report cards</p>
+                </div>
+
+                <!-- Filters -->
+                <div class="bg-white shadow-lg rounded-2xl p-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Class</label>
+                            <select id="classFilterGrades" class="block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-pink-500 focus:border-pink-500">
+                                <option value="">All Classes</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                            <select id="subjectFilterGrades" class="block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-pink-500 focus:border-pink-500">
+                                <option value="">All Subjects</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Exam Type</label>
+                            <select id="examTypeFilter" class="block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-pink-500 focus:border-pink-500">
+                                <option value="">All Exams</option>
+                                <option value="midterm">Midterm</option>
+                                <option value="final">Final</option>
+                                <option value="quiz">Quiz</option>
+                                <option value="assignment">Assignment</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button id="addGradeBtn" class="w-full bg-gradient-to-r from-pink-500 to-rose-600 text-white px-4 py-2 rounded-xl font-semibold hover:from-pink-600 hover:to-rose-700 transform hover:scale-105 transition-all shadow-lg">
+                                + Add Grade
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grades Table -->
+                <div class="bg-white shadow-lg rounded-2xl overflow-hidden mb-6">
+                    <div class="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg leading-6 font-bold text-gray-900">Student Grades</h3>
+                            <p class="text-sm text-gray-500">View and manage all student grades</p>
+                        </div>
+                        <button id="generateReportBtn" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transform hover:scale-105 transition-all shadow-lg">
+                            📄 Generate Reports
+                        </button>
+                    </div>
+                    <div id="gradesTableContainer">
+                        <div class="text-center py-8">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-pink-600 mx-auto"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grade Statistics -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="text-3xl font-bold mb-2">A+</div>
+                        <div class="text-sm opacity-90">Excellent</div>
+                        <div class="text-2xl font-bold mt-2" id="gradeAPlus">0</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="text-3xl font-bold mb-2">A-B</div>
+                        <div class="text-sm opacity-90">Good</div>
+                        <div class="text-2xl font-bold mt-2" id="gradeAB">0</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="text-3xl font-bold mb-2">C-D</div>
+                        <div class="text-sm opacity-90">Average</div>
+                        <div class="text-2xl font-bold mt-2" id="gradeCD">0</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="text-3xl font-bold mb-2">F</div>
+                        <div class="text-sm opacity-90">Needs Improvement</div>
+                        <div class="text-2xl font-bold mt-2" id="gradeF">0</div>
+                    </div>
                 </div>
             </div>
         `;
+    },
+
+    async loadFilters() {
+        try {
+            const [classesData, subjectsData] = await Promise.all([
+                API.get('/api/classes'),
+                API.get('/api/subjects')
+            ]);
+
+            const classSelect = $('#classFilterGrades');
+            classesData.data.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls.id;
+                option.textContent = cls.name;
+                classSelect.appendChild(option);
+            });
+
+            const subjectSelect = $('#subjectFilterGrades');
+            subjectsData.data.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.id;
+                option.textContent = subject.name;
+                subjectSelect.appendChild(option);
+            });
+
+            await this.loadGrades();
+        } catch (error) {
+            this.showNotification('Error loading filters: ' + error.message, 'error');
+        }
+    },
+
+    async loadGrades() {
+        try {
+            let url = `/api/grades?page=${this.currentPage}`;
+            if (this.selectedClass) url += `&class_id=${this.selectedClass}`;
+            if (this.selectedSubject) url += `&subject_id=${this.selectedSubject}`;
+
+            const data = await API.get(url);
+            this.grades = data.data || [];
+            this.renderTable(data);
+            this.updateStatistics();
+        } catch (error) {
+            $('#gradesTableContainer').innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="mx-auto h-12 w-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-red-600">Error: ${error.message}</p>
+                </div>
+            `;
+        }
+    },
+
+    renderTable(data) {
+        const container = $('#gradesTableContainer');
+
+        if (!this.grades.length) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p class="text-gray-500 mt-2">No grades found</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gradient-to-r from-pink-50 to-rose-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Student</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Subject</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Exam Type</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Marks</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Grade</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Percentage</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${this.grades.map(grade => {
+                            const percentage = (grade.marks_obtained / grade.total_marks * 100).toFixed(2);
+                            const gradeClass = this.getGradeColorClass(grade.grade);
+                            return `
+                                <tr class="hover:bg-pink-50 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white font-bold shadow-lg">
+                                                ${grade.student?.user?.name?.charAt(0).toUpperCase() || '?'}
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-semibold text-gray-900">${grade.student?.user?.name || 'Unknown'}</div>
+                                                <div class="text-xs text-gray-500">${grade.student?.admission_number || 'N/A'}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${grade.subject?.name || 'N/A'}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">${grade.exam_type || 'Regular'}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">${grade.marks_obtained}/${grade.total_marks}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-3 py-1 rounded-full text-xs font-bold ${gradeClass}">${grade.grade}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">${percentage}%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button onclick="GradesComponent.editGrade(${grade.id})" class="text-pink-600 hover:text-pink-900 mr-3">Edit</button>
+                                        <button onclick="GradesComponent.deleteGrade(${grade.id})" class="text-red-600 hover:text-red-900">Delete</button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-700">
+                        Showing <span class="font-medium">${data.from || 0}</span> to <span class="font-medium">${data.to || 0}</span> of
+                        <span class="font-medium">${data.total || 0}</span> results
+                    </div>
+                    <div class="flex space-x-2">
+                        ${data.prev_page_url ? `<button onclick="GradesComponent.goToPage(${data.current_page - 1})" class="px-4 py-2 border rounded-lg bg-white hover:bg-pink-50 text-pink-600 font-medium transition-colors">Previous</button>` : ''}
+                        ${data.next_page_url ? `<button onclick="GradesComponent.goToPage(${data.current_page + 1})" class="px-4 py-2 border rounded-lg bg-white hover:bg-pink-50 text-pink-600 font-medium transition-colors">Next</button>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    getGradeColorClass(grade) {
+        const gradeColors = {
+            'A+': 'bg-green-100 text-green-800',
+            'A': 'bg-green-100 text-green-700',
+            'A-': 'bg-blue-100 text-blue-700',
+            'B+': 'bg-blue-100 text-blue-600',
+            'B': 'bg-blue-100 text-blue-700',
+            'B-': 'bg-yellow-100 text-yellow-700',
+            'C+': 'bg-yellow-100 text-yellow-700',
+            'C': 'bg-yellow-100 text-yellow-700',
+            'C-': 'bg-orange-100 text-orange-700',
+            'D': 'bg-orange-100 text-orange-700',
+            'F': 'bg-red-100 text-red-700'
+        };
+        return gradeColors[grade] || 'bg-gray-100 text-gray-700';
+    },
+
+    updateStatistics() {
+        const stats = { 'A+': 0, 'A-B': 0, 'C-D': 0, 'F': 0 };
+
+        this.grades.forEach(grade => {
+            if (grade.grade === 'A+') stats['A+']++;
+            else if (['A', 'A-', 'B+', 'B', 'B-'].includes(grade.grade)) stats['A-B']++;
+            else if (['C+', 'C', 'C-', 'D'].includes(grade.grade)) stats['C-D']++;
+            else if (grade.grade === 'F') stats['F']++;
+        });
+
+        $('#gradeAPlus').textContent = stats['A+'];
+        $('#gradeAB').textContent = stats['A-B'];
+        $('#gradeCD').textContent = stats['C-D'];
+        $('#gradeF').textContent = stats['F'];
+    },
+
+    attachEventListeners() {
+        $('#classFilterGrades').addEventListener('change', (e) => {
+            this.selectedClass = e.target.value;
+            this.loadGrades();
+        });
+
+        $('#subjectFilterGrades').addEventListener('change', (e) => {
+            this.selectedSubject = e.target.value;
+            this.loadGrades();
+        });
+
+        $('#examTypeFilter').addEventListener('change', () => {
+            this.loadGrades();
+        });
+
+        $('#addGradeBtn').addEventListener('click', () => {
+            alert('Add grade modal (implement similar to Students)');
+        });
+
+        $('#generateReportBtn').addEventListener('click', () => {
+            this.generateReports();
+        });
+    },
+
+    async deleteGrade(id) {
+        if (!confirm('Are you sure you want to delete this grade?')) return;
+
+        try {
+            await API.delete(`/api/grades/${id}`);
+            await this.loadGrades();
+            this.showNotification('Grade deleted successfully', 'success');
+        } catch (error) {
+            this.showNotification('Error: ' + error.message, 'error');
+        }
+    },
+
+    editGrade(id) {
+        alert('Edit grade modal - ID: ' + id);
+    },
+
+    goToPage(page) {
+        this.currentPage = page;
+        this.loadGrades();
+    },
+
+    generateReports() {
+        this.showNotification('Generating report cards... (Feature coming soon!)', 'success');
+    },
+
+    showNotification(message, type) {
+        const notification = createElement('div', {
+            className: `fixed top-4 right-4 px-6 py-4 rounded-xl shadow-2xl text-white ${type === 'success' ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gradient-to-r from-red-500 to-red-600'} fade-in z-50 transform hover:scale-105 transition-all`
+        }, message);
+
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 };
 
@@ -1695,4 +2303,6 @@ window.StudentsComponent = StudentsComponent;
 window.TeachersComponent = TeachersComponent;
 window.ClassesComponent = ClassesComponent;
 window.SubjectsComponent = SubjectsComponent;
+window.AttendanceComponent = AttendanceComponent;
+window.GradesComponent = GradesComponent;
 window.SchoolApp = SchoolApp;
