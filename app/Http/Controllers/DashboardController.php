@@ -36,9 +36,19 @@ class DashboardController extends Controller
                 ->take(5)
                 ->get(),
             'attendance_rate' => $this->getAttendanceRate(),
+            'average_grade' => $this->getAverageGrade(),
+            'pending_grades' => Grade::where('status', 'pending')->count(),
         ];
 
         return response()->json($stats);
+    }
+
+    private function getAverageGrade()
+    {
+        $average = Grade::where('status', 'approved')
+            ->avg('score');
+
+        return $average ? round($average, 2) : 0;
     }
 
     private function getAttendanceRate()

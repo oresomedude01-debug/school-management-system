@@ -633,6 +633,7 @@
 @section('scripts')
 <script src="/js/i18n.js"></script>
 <script src="/js/charts.js"></script>
+<script src="/js/dashboard-roles.js"></script>
 <script src="/js/app.js"></script>
 <script>
     // Initialize the application
@@ -646,6 +647,13 @@
         initializeSidebarNavigation();
         initializeMobileFeatures();
         initializeLanguageSwitcher();
+
+        // Initialize role-based dashboard if on dashboard page
+        @if(Request::is('dashboard'))
+            if (typeof RoleBasedDashboard !== 'undefined') {
+                RoleBasedDashboard.init();
+            }
+        @endif
     });
 
     function initializeSidebarNavigation() {
