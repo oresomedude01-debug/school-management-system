@@ -54,6 +54,7 @@
 @endsection
 
 @section('scripts')
+<script src="/js/charts.js"></script>
 <script src="/js/app.js"></script>
 <script>
     // Initialize the application
