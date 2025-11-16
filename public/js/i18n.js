@@ -4,7 +4,8 @@ class I18n {
         this.locale = this.getStoredLocale() || 'en';
         this.fallbackLocale = 'en';
         this.translations = {};
-        this.rtlLocales = ['ar', 'he', 'fa', 'ur'];
+        // Disabled RTL - maintain LTR layout for all languages
+        this.rtlLocales = []; // Empty array - no RTL languages
     }
 
     // Get stored locale from localStorage
@@ -20,7 +21,7 @@ class I18n {
         // Load translations for this locale
         await this.loadTranslations(locale);
 
-        // Update document direction
+        // Update document direction - ALWAYS LTR
         this.updateDirection();
 
         // Trigger locale change event
@@ -70,20 +71,20 @@ class I18n {
         return value;
     }
 
-    // Check if current locale is RTL
+    // Check if current locale is RTL - ALWAYS RETURNS FALSE
     isRTL() {
-        return this.rtlLocales.includes(this.locale);
+        return false; // Force LTR for all languages
     }
 
-    // Update document direction
+    // Update document direction - ALWAYS LTR
     updateDirection() {
-        const dir = this.isRTL() ? 'rtl' : 'ltr';
-        document.documentElement.setAttribute('dir', dir);
+        // Force LTR direction for all languages
+        document.documentElement.setAttribute('dir', 'ltr');
         document.documentElement.setAttribute('lang', this.locale);
 
-        // Update body class for easier styling
-        document.body.classList.toggle('rtl', this.isRTL());
-        document.body.classList.toggle('ltr', !this.isRTL());
+        // Always set LTR class
+        document.body.classList.remove('rtl');
+        document.body.classList.add('ltr');
     }
 
     // Get current locale

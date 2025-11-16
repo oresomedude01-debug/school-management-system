@@ -901,23 +901,8 @@
             const newLocale = e.detail.locale;
             console.log('Locale changed to:', newLocale);
 
-            // Update sidebar position for RTL
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.querySelector('.lg\\:ml-64');
-
-            if (i18n.isRTL()) {
-                // RTL mode
-                sidebar.classList.add('sidebar-rtl');
-                if (mainContent) {
-                    mainContent.classList.add('rtl-content');
-                }
-            } else {
-                // LTR mode
-                sidebar.classList.remove('sidebar-rtl');
-                if (mainContent) {
-                    mainContent.classList.remove('rtl-content');
-                }
-            }
+            // Layout remains LTR for all languages
+            // Only text content changes based on selected language
         });
     }
 </script>
