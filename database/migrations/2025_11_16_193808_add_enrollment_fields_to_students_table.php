@@ -12,18 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('students', function (Blueprint $table) {
-            // Personal Information
+            // Personal Information (date_of_birth and gender already exist)
             $table->string('first_name')->nullable()->after('user_id');
             $table->string('middle_name')->nullable()->after('first_name');
             $table->string('last_name')->nullable()->after('middle_name');
-            $table->date('date_of_birth')->nullable()->after('last_name');
-            $table->enum('gender', ['male', 'female', 'other'])->nullable()->after('date_of_birth');
             $table->string('nationality')->nullable()->after('gender');
             $table->text('address')->nullable()->after('nationality');
             $table->string('photo_path')->nullable()->after('address');
 
-            // Admission Information
-            $table->string('admission_number')->unique()->nullable()->after('photo_path');
+            // Admission Information (admission_number already exists but needs to be nullable)
             $table->date('enrollment_date')->nullable()->after('admission_number');
             $table->enum('admission_status', ['provisional', 'fully_admitted'])->default('provisional')->after('enrollment_date');
 
@@ -53,9 +50,13 @@ return new class extends Migration
             $table->foreignId('registration_token_id')->nullable()->constrained('registration_tokens')->onDelete('set null')->after('preferred_contact_method');
 
             // Indexes
-            $table->index('admission_number');
             $table->index('enrollment_date');
             $table->index('admission_status');
+        });
+
+        // Modify admission_number to be nullable (in a separate statement)
+        Schema::table('students', function (Blueprint $table) {
+            $table->string('admission_number')->nullable()->change();
         });
     }
 
@@ -66,8 +67,8 @@ return new class extends Migration
     {
         Schema::table('students', function (Blueprint $table) {
             $table->dropColumn([
-                'first_name', 'middle_name', 'last_name', 'date_of_birth', 'gender',
-                'nationality', 'address', 'photo_path', 'admission_number', 'enrollment_date',
+                'first_name', 'middle_name', 'last_name',
+                'nationality', 'address', 'photo_path', 'enrollment_date',
                 'admission_status', 'previous_school_name', 'previous_school_address',
                 'previous_class', 'transfer_reason', 'previous_result_path', 'allergies',
                 'medical_conditions', 'emergency_contact_name', 'emergency_contact_phone',
@@ -75,6 +76,11 @@ return new class extends Migration
                 'guardian2_phone', 'guardian2_email', 'guardian2_occupation',
                 'preferred_contact_method', 'registration_token_id'
             ]);
+        });
+
+        // Restore admission_number to not nullable
+        Schema::table('students', function (Blueprint $table) {
+            $table->string('admission_number')->nullable(false)->change();
         });
     }
 };
