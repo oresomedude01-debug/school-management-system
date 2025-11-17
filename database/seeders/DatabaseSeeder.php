@@ -10,6 +10,7 @@ use App\Models\Subject;
 use App\Models\Enrollment;
 use App\Models\Attendance;
 use App\Models\Grade;
+use App\Models\RegistrationToken;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -198,12 +199,28 @@ class DatabaseSeeder extends Seeder
             }
         }
 
+        // Create registration tokens for testing enrollment system
+        $tokens = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $tokens[] = RegistrationToken::create([
+                'token_code' => RegistrationToken::generateTokenCode(),
+                'status' => 'active',
+                'academic_year' => '2024-2025',
+                'intended_class' => 'Grade ' . rand(1, 5),
+                'expiry_date' => now()->addMonths(3),
+                'note' => 'Test enrollment token ' . $i,
+            ]);
+        }
+
         $this->command->info('Database seeded successfully!');
         $this->command->info('Admin: admin@school.com / password123');
         $this->command->info('Teachers: ' . count($teachers) . ' created');
         $this->command->info('Classes: ' . count($createdClasses) . ' created');
         $this->command->info('Students: ' . count($students) . ' created');
         $this->command->info('Subjects: ' . count($createdSubjects) . ' created');
+        $this->command->info('Registration Tokens: ' . count($tokens) . ' created');
+        $this->command->info('');
+        $this->command->info('Sample Token Code: ' . $tokens[0]->token_code);
     }
 
     private function calculateGrade($marks)
