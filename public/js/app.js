@@ -650,8 +650,89 @@ const StudentsComponent = {
     },
 
     async viewStudent(id) {
-        // TODO: Implement view student details
-        alert('View student details - ID: ' + id);
+        try {
+            const student = await API.get(`/api/students/${id}`);
+            const modal = this.createViewStudentModal(student);
+            $('#modalContainer').innerHTML = modal;
+            this.attachViewModalListeners();
+        } catch (error) {
+            this.showNotification('Error loading student details: ' + error.message, 'error');
+        }
+    },
+
+    createViewStudentModal(student) {
+        return `
+            <div id="studentModal" class="fixed z-10 inset-0 overflow-y-auto">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <div class="flex items-center mb-4">
+                                <div class="h-12 w-12 flex-shrink-0 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl">
+                                    ${student.user.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-gray-900">Student Details</h3>
+                                    <p class="text-sm text-gray-500">${student.admission_number}</p>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-200 pt-4">
+                                <dl class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Full Name</dt>
+                                        <dd class="text-sm text-gray-900">${student.user.name}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Email</dt>
+                                        <dd class="text-sm text-gray-900">${student.user.email}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Admission Number</dt>
+                                        <dd class="text-sm text-gray-900">${student.admission_number}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Date of Birth</dt>
+                                        <dd class="text-sm text-gray-900">${student.date_of_birth || 'N/A'}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Gender</dt>
+                                        <dd class="text-sm text-gray-900 capitalize">${student.gender || 'N/A'}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Parent Name</dt>
+                                        <dd class="text-sm text-gray-900">${student.parent_name || 'N/A'}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Parent Phone</dt>
+                                        <dd class="text-sm text-gray-900">${student.parent_phone || 'N/A'}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Status</dt>
+                                        <dd class="text-sm">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                                ${student.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                                ${student.status}
+                                            </span>
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button type="button" id="closeViewModal" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:w-auto sm:text-sm">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    attachViewModalListeners() {
+        $('#closeViewModal').addEventListener('click', () => {
+            $('#modalContainer').innerHTML = '';
+        });
     },
 
     goToPage(page) {
