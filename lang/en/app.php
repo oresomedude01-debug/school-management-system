@@ -13,6 +13,7 @@ return [
         'subjects' => 'Subjects',
         'attendance' => 'Attendance',
         'grades' => 'Grades',
+        'tokens' => 'Enrollment Tokens',
         'more' => 'More',
         'home' => 'Home',
         'attend' => 'Attend',

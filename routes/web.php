@@ -9,6 +9,8 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\LocalizationController;
+use App\Http\Controllers\RegistrationTokenController;
+use App\Http\Controllers\EnrollmentController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -19,6 +21,11 @@ Route::get('/', function () {
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Public Student Enrollment Routes
+Route::get('/enroll', [EnrollmentController::class, 'showEnrollmentForm'])->name('enrollment.form');
+Route::post('/api/enrollment/verify-token', [EnrollmentController::class, 'verifyToken']);
+Route::post('/api/enrollment/enroll', [EnrollmentController::class, 'enroll']);
 
 // Protected routes
 Route::middleware(['auth'])->group(function () {
@@ -33,6 +40,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/subjects', function () { return view('subjects.index'); })->name('subjects');
     Route::get('/attendance', function () { return view('attendance.index'); })->name('attendance');
     Route::get('/grades', function () { return view('grades.index'); })->name('grades');
+    Route::get('/tokens', function () { return view('tokens.index'); })->name('tokens');
 
     // Students API
     Route::get('/api/students', [StudentController::class, 'index']);
@@ -74,6 +82,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/grades/{grade}', [GradeController::class, 'show']);
     Route::put('/api/grades/{grade}', [GradeController::class, 'update']);
     Route::delete('/api/grades/{grade}', [GradeController::class, 'destroy']);
+
+    // Registration Tokens API
+    Route::get('/api/tokens', [RegistrationTokenController::class, 'index']);
+    Route::post('/api/tokens', [RegistrationTokenController::class, 'store']);
+    Route::get('/api/tokens/{token}', [RegistrationTokenController::class, 'show']);
+    Route::put('/api/tokens/{token}', [RegistrationTokenController::class, 'update']);
+    Route::delete('/api/tokens/{token}', [RegistrationTokenController::class, 'destroy']);
+    Route::post('/api/tokens/verify', [RegistrationTokenController::class, 'verify']);
 
     // Localization
     Route::get('/api/translations/{locale}', [LocalizationController::class, 'getTranslations']);

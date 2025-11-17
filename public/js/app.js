@@ -2196,6 +2196,7 @@ const SchoolApp = {
         this.router.register('subjects', () => SubjectsComponent.render());
         this.router.register('attendance', () => AttendanceComponent.render());
         this.router.register('grades', () => GradesComponent.render());
+        this.router.register('tokens', () => TokensComponent.render());
     },
 
     setupEventListeners() {
@@ -2308,4 +2309,335 @@ window.ClassesComponent = ClassesComponent;
 window.SubjectsComponent = SubjectsComponent;
 window.AttendanceComponent = AttendanceComponent;
 window.GradesComponent = GradesComponent;
+window.TokensComponent = TokensComponent;
 window.SchoolApp = SchoolApp;
+
+// ===== REGISTRATION TOKENS COMPONENT =====
+const TokensComponent = {
+    tokens: [],
+    currentPage: 1,
+    filters: {},
+
+    async render() {
+        const content = $('#mainContent');
+        content.innerHTML = this.getTemplate();
+        await this.loadTokens();
+        this.attachEventListeners();
+    },
+
+    getTemplate() {
+        return `
+            <div class="px-4 sm:px-0">
+                <div class="sm:flex sm:items-center sm:justify-between mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">Enrollment Tokens</h2>
+                        <p class="mt-1 text-sm text-gray-500">Generate and manage student enrollment tokens</p>
+                    </div>
+                    <button id="addTokenBtn" class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-lg text-sm font-medium text-white bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 focus:outline-none transform hover:scale-105 transition-all">
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Generate Token
+                    </button>
+                </div>
+
+                <!-- Public Enrollment Link -->
+                <div class="mb-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-800">Public Enrollment Link</h3>
+                            <p class="text-xs text-gray-600 mt-1">Share this link with students to enroll using tokens</p>
+                        </div>
+                        <a href="/enroll" target="_blank" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium">
+                            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                            Open Enrollment Form
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="mb-6 bg-white rounded-xl shadow-sm p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select id="statusFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="consumed">Consumed</option>
+                                <option value="expired">Expired</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                            <input type="text" id="searchInput" placeholder="Token code or class..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tokens Table -->
+                <div class="bg-white shadow-lg rounded-2xl overflow-hidden" id="tokensContainer">
+                    <div class="animate-pulse p-8">
+                        <div class="h-8 bg-gray-200 rounded w-full mb-4"></div>
+                        <div class="h-8 bg-gray-200 rounded w-full mb-4"></div>
+                        <div class="h-8 bg-gray-200 rounded w-full"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    async loadTokens() {
+        try {
+            let url = '/api/tokens?per_page=15&page=' + this.currentPage;
+
+            if (this.filters.status) url += '&status=' + this.filters.status;
+            if (this.filters.search) url += '&search=' + this.filters.search;
+
+            const response = await API.get(url);
+            this.tokens = response.data;
+            this.pagination = {
+                current_page: response.current_page,
+                last_page: response.last_page,
+                total: response.total
+            };
+
+            this.renderTokens();
+        } catch (error) {
+            this.showNotification('Error loading tokens: ' + error.message, 'error');
+        }
+    },
+
+    renderTokens() {
+        const container = $('#tokensContainer');
+
+        if (this.tokens.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No tokens</h3>
+                    <p class="mt-1 text-sm text-gray-500">Get started by generating a new token.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gradient-to-r from-teal-50 to-cyan-50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Token Code</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Academic Year</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Intended Class</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Expires</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    ${this.tokens.map(token => `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <code class="px-3 py-1 bg-gray-100 rounded font-mono text-sm font-bold text-gray-800">${token.token_code}</code>
+                                    <button onclick="TokensComponent.copyToken('${token.token_code}')" class="ml-2 text-gray-400 hover:text-teal-600" title="Copy token">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${token.academic_year}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${token.intended_class}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                                    ${token.status === 'active' ? 'bg-green-100 text-green-800' :
+                                      token.status === 'consumed' ? 'bg-blue-100 text-blue-800' :
+                                      token.status === 'expired' ? 'bg-red-100 text-red-800' :
+                                      'bg-gray-100 text-gray-800'}">
+                                    ${token.status}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(token.expiry_date).toLocaleDateString()}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button onclick="TokensComponent.viewToken(${token.id})" class="text-teal-600 hover:text-teal-900 mr-3">View</button>
+                                <button onclick="TokensComponent.deleteToken(${token.id})" class="text-red-600 hover:text-red-900">Delete</button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            ${this.pagination && this.pagination.last_page > 1 ? `
+                <div class="bg-gray-50 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <button ${this.pagination.current_page === 1 ? 'disabled' : ''} onclick="TokensComponent.goToPage(${this.pagination.current_page - 1})" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Previous
+                        </button>
+                        <button ${this.pagination.current_page === this.pagination.last_page ? 'disabled' : ''} onclick="TokensComponent.goToPage(${this.pagination.current_page + 1})" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Next
+                        </button>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Showing <span class="font-medium">${this.tokens.length}</span> of <span class="font-medium">${this.pagination.total}</span> results
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                ${Array.from({length: this.pagination.last_page}, (_, i) => i + 1).map(page => `
+                                    <button onclick="TokensComponent.goToPage(${page})" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium ${page === this.pagination.current_page ? 'text-teal-600 bg-teal-50' : 'text-gray-700 hover:bg-gray-50'}">
+                                        ${page}
+                                    </button>
+                                `).join('')}
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+        `;
+    },
+
+    attachEventListeners() {
+        $('#addTokenBtn').addEventListener('click', () => this.openModal());
+
+        const statusFilter = $('#statusFilter');
+        if (statusFilter) {
+            statusFilter.addEventListener('change', (e) => {
+                this.filters.status = e.target.value;
+                this.currentPage = 1;
+                this.loadTokens();
+            });
+        }
+
+        const searchInput = $('#searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(this.searchTimeout);
+                this.searchTimeout = setTimeout(() => {
+                    this.filters.search = e.target.value;
+                    this.currentPage = 1;
+                    this.loadTokens();
+                }, 500);
+            });
+        }
+    },
+
+    openModal(token = null) {
+        const isEdit = !!token;
+        const modal = $('#modalContainer');
+
+        modal.innerHTML = `
+            <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto transform transition-all">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-900">${isEdit ? 'Edit Token' : 'Generate New Token'}</h3>
+                    </div>
+                    <form id="tokenForm" class="px-6 py-4">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Academic Year *</label>
+                                <input type="text" name="academic_year" required value="${token?.academic_year || new Date().getFullYear() + '-' + (new Date().getFullYear() + 1)}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Intended Class *</label>
+                                <input type="text" name="intended_class" required value="${token?.intended_class || ''}" placeholder="e.g., Grade 1-A" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Date *</label>
+                                <input type="date" name="expiry_date" required value="${token?.expiry_date ? token.expiry_date.split('T')[0] : ''}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Note (Optional)</label>
+                                <textarea name="note" rows="3" placeholder="Any additional notes..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none">${token?.note || ''}</textarea>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <button type="button" id="closeModal" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" class="flex-1 px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg hover:from-teal-700 hover:to-cyan-700">
+                                ${isEdit ? 'Update' : 'Generate'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+
+        this.attachModalListeners(isEdit, token);
+    },
+
+    attachModalListeners(isEdit, token) {
+        $('#closeModal').addEventListener('click', () => {
+            $('#modalContainer').innerHTML = '';
+        });
+
+        $('#tokenForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                if (isEdit) {
+                    await API.put(`/api/tokens/${token.id}`, data);
+                    this.showNotification('Token updated successfully', 'success');
+                } else {
+                    await API.post('/api/tokens', data);
+                    this.showNotification('Token generated successfully', 'success');
+                }
+
+                $('#modalContainer').innerHTML = '';
+                await this.loadTokens();
+            } catch (error) {
+                this.showNotification('Error: ' + error.message, 'error');
+            }
+        });
+    },
+
+    async viewToken(id) {
+        try {
+            const token = await API.get(`/api/tokens/${id}`);
+            this.openModal(token);
+        } catch (error) {
+            this.showNotification('Error: ' + error.message, 'error');
+        }
+    },
+
+    async deleteToken(id) {
+        if (!confirm('Are you sure you want to delete this token?')) return;
+
+        try {
+            await API.delete(`/api/tokens/${id}`);
+            await this.loadTokens();
+            this.showNotification('Token deleted successfully', 'success');
+        } catch (error) {
+            this.showNotification('Error: ' + error.message, 'error');
+        }
+    },
+
+    copyToken(tokenCode) {
+        navigator.clipboard.writeText(tokenCode);
+        this.showNotification('Token copied to clipboard!', 'success');
+    },
+
+    goToPage(page) {
+        this.currentPage = page;
+        this.loadTokens();
+    },
+
+    showNotification(message, type) {
+        const notification = createElement('div', {
+            className: `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} fade-in z-50`
+        }, message);
+
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
+};
