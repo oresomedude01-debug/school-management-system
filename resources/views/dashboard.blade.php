@@ -361,13 +361,42 @@
                 <span data-i18n="nav.dashboard">Dashboard</span>
             </a>
 
-            <!-- Students -->
-            <a href="/students" data-route="students" class="nav-item {{ Request::is('students*') ? 'active text-white' : 'text-gray-700 hover:bg-blue-50' }} flex items-center space-x-3 px-4 py-3 rounded-xl font-medium">
-                <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                </svg>
-                <span data-i18n="nav.students">Students</span>
-            </a>
+            <!-- Students Menu with Submenu -->
+            <div class="student-menu-wrapper">
+                <button onclick="toggleStudentSubmenu()" class="nav-item {{ Request::is('students*') || Request::is('student-management*') || Request::is('registration-tokens*') ? 'active text-white' : 'text-gray-700 hover:bg-blue-50' }} flex items-center justify-between w-full px-4 py-3 rounded-xl font-medium">
+                    <div class="flex items-center space-x-3">
+                        <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <span data-i18n="nav.students">Students</span>
+                    </div>
+                    <svg id="student-submenu-arrow" class="h-5 w-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+
+                <!-- Student Submenu -->
+                <div id="student-submenu" class="hidden mt-2 ml-4 space-y-1 border-l-2 border-blue-200 pl-4">
+                    <a href="/students" data-route="students" class="nav-item {{ Request::is('students') ? 'active text-white' : 'text-gray-600 hover:text-gray-900 hover:bg-blue-50' }} flex items-center space-x-3 px-4 py-2 rounded-lg text-sm font-medium">
+                        <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                        <span data-i18n="nav.student_list">Student List</span>
+                    </a>
+                    <a href="/student-management" data-route="student-management" class="nav-item {{ Request::is('student-management*') ? 'active text-white' : 'text-gray-600 hover:text-gray-900 hover:bg-blue-50' }} flex items-center space-x-3 px-4 py-2 rounded-lg text-sm font-medium">
+                        <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                        <span data-i18n="nav.add_student">Add Student</span>
+                    </a>
+                    <a href="/registration-tokens" data-route="registration-tokens" class="nav-item {{ Request::is('registration-tokens*') ? 'active text-white' : 'text-gray-600 hover:text-gray-900 hover:bg-blue-50' }} flex items-center space-x-3 px-4 py-2 rounded-lg text-sm font-medium">
+                        <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                        </svg>
+                        <span data-i18n="nav.registration_tokens">Registration Tokens</span>
+                    </a>
+                </div>
+            </div>
 
             <!-- Teachers -->
             <a href="/teachers" data-route="teachers" class="nav-item {{ Request::is('teachers*') ? 'active text-white' : 'text-gray-700 hover:bg-green-50' }} flex items-center space-x-3 px-4 py-3 rounded-xl font-medium">
@@ -654,7 +683,38 @@
                 RoleBasedDashboard.init();
             }
         @endif
+
+        // Auto-open student submenu if on student pages
+        @if(Request::is('students*') || Request::is('student-management*') || Request::is('registration-tokens*'))
+            openStudentSubmenu();
+        @endif
     });
+
+    // Toggle student submenu
+    function toggleStudentSubmenu() {
+        const submenu = document.getElementById('student-submenu');
+        const arrow = document.getElementById('student-submenu-arrow');
+
+        if (submenu.classList.contains('hidden')) {
+            openStudentSubmenu();
+        } else {
+            closeStudentSubmenu();
+        }
+    }
+
+    function openStudentSubmenu() {
+        const submenu = document.getElementById('student-submenu');
+        const arrow = document.getElementById('student-submenu-arrow');
+        submenu.classList.remove('hidden');
+        arrow.style.transform = 'rotate(180deg)';
+    }
+
+    function closeStudentSubmenu() {
+        const submenu = document.getElementById('student-submenu');
+        const arrow = document.getElementById('student-submenu-arrow');
+        submenu.classList.add('hidden');
+        arrow.style.transform = 'rotate(0deg)';
+    }
 
     function initializeSidebarNavigation() {
         const navItems = document.querySelectorAll('.nav-item');

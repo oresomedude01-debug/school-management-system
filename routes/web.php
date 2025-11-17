@@ -9,6 +9,9 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\LocalizationController;
+use App\Http\Controllers\PublicEnrollmentController;
+use App\Http\Controllers\RegistrationTokenController;
+use App\Http\Controllers\StudentManagementController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -19,6 +22,12 @@ Route::get('/', function () {
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Public Enrollment Routes
+Route::get('/enrollment', [PublicEnrollmentController::class, 'index'])->name('enrollment.index');
+Route::post('/enrollment/validate-token', [PublicEnrollmentController::class, 'validateToken'])->name('enrollment.validate');
+Route::post('/enrollment/submit', [PublicEnrollmentController::class, 'submit'])->name('enrollment.submit');
+Route::post('/enrollment/check-status', [PublicEnrollmentController::class, 'checkStatus'])->name('enrollment.status');
 
 // Protected routes
 Route::middleware(['auth'])->group(function () {
@@ -74,6 +83,26 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/grades/{grade}', [GradeController::class, 'show']);
     Route::put('/api/grades/{grade}', [GradeController::class, 'update']);
     Route::delete('/api/grades/{grade}', [GradeController::class, 'destroy']);
+
+    // Registration Token Management (Admin only)
+    Route::get('/registration-tokens', function () { return view('admin.tokens.index'); })->name('tokens.index');
+    Route::get('/api/registration-tokens', [RegistrationTokenController::class, 'index']);
+    Route::post('/api/registration-tokens', [RegistrationTokenController::class, 'store']);
+    Route::post('/api/registration-tokens/bulk', [RegistrationTokenController::class, 'bulkGenerate']);
+    Route::get('/api/registration-tokens/statistics', [RegistrationTokenController::class, 'getStatistics']);
+    Route::get('/api/registration-tokens/export', [RegistrationTokenController::class, 'export']);
+    Route::get('/api/registration-tokens/{id}', [RegistrationTokenController::class, 'show']);
+    Route::put('/api/registration-tokens/{id}/status', [RegistrationTokenController::class, 'updateStatus']);
+    Route::delete('/api/registration-tokens/{id}', [RegistrationTokenController::class, 'destroy']);
+
+    // Student Management (Enhanced CRUD)
+    Route::get('/student-management', function () { return view('admin.students.index'); })->name('student-management');
+    Route::get('/api/student-management', [StudentManagementController::class, 'index']);
+    Route::post('/api/student-management', [StudentManagementController::class, 'store']);
+    Route::get('/api/student-management/statistics', [StudentManagementController::class, 'getStatistics']);
+    Route::get('/api/student-management/{id}', [StudentManagementController::class, 'show']);
+    Route::put('/api/student-management/{id}', [StudentManagementController::class, 'update']);
+    Route::delete('/api/student-management/{id}', [StudentManagementController::class, 'destroy']);
 
     // Localization
     Route::get('/api/translations/{locale}', [LocalizationController::class, 'getTranslations']);
